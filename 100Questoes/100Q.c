@@ -30,8 +30,12 @@ int average() {
         if (num != 0) counter++;
         result += num;
     }
+    if (!counter)
+        result = 0;
+    else 
+        result /= counter;
 
-    return result/counter;
+    return result;
 }
 
 // Q3
@@ -1661,10 +1665,11 @@ void printTree(ABin a) {
 }
 
 int main() {
-  /*  printf("Largest Element: %d\n", largestElem());
+    printf("Largest Element: %d\n", largestElem());
     printf("Average: %d\n", average());
     printf("Second Largest Element: %d\n", secondLargest());
-*/
+
+    printf("Teste de conversão de uma lista para uma btree:\n");
     int v[10] = {1,2,3,4,5,6,7,8,9,10};
     LInt l = arrayToList(v, 10);
     ABin a = NULL;
