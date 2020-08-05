@@ -10,10 +10,10 @@
 void insere (int v[], int N, int x) {
     int i;
 
-    for (i = 0; v[i] && v[i] < x; i++);
+    for (i = 0; v[i] < x && i < N; i++);
     
     for (; i < N; N--)
-        v[N] = v[N-1];
+        v[N-1] = v[N-2];
     
     v[i] = x;
 }
@@ -45,15 +45,15 @@ void iSort2 (int v[], int N) {
 
 int isSorted (int v[], int N){
 	int i;
-	for (i=0; i<N-1 && v[i] <= v[i+1]; i++)
-		;
+	for (i=0; i<N-1 && v[i] <= v[i+1]; i++);
+
 	return (i==N-1);
 }
 
 void dumpV (int v[], int N){
    int i;
-   for (i=0; i<N; printf ("%d ", v[i++]))
-   	   ;
+
+   for (i=0; i<N; printf ("%d ", v[i++]));
 }
 typedef void SORT (int *, int);
 
