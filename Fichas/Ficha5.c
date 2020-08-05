@@ -4,6 +4,8 @@
 #include <string.h>
 #include <ctype.h>
 
+// NÃO ESTÁ BEM FEITO DE TODO AINDA
+
 // Exercício 1
 void insere (int v[], int N, int x) {
     int i;
