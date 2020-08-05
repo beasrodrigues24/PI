@@ -17,7 +17,7 @@ typedef struct arv {
     struct arv *esq, *dir;
 } *Turma;
 
-// Exercício 1 -- Optei por ordem alfabética
+// Exercício 1 
 
 int acrescentaAluno(Turma *t, Aluno a) {
     Turma aux = *t, back = NULL;
