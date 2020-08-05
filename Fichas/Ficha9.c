@@ -15,7 +15,7 @@ void initDic (Dicionario *d) {
     *d = NULL;
 }
 
-int acrescenta (Dicionario *d, char *pal) { // TESTAR
+int acrescenta (Dicionario *d, char *pal) { // Usei ordem alfabética
     Dicionario aux = *d, back = NULL;
     int ans = 1, flag = 1;
 
