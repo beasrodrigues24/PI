@@ -4,8 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-// NOT READY YET
-
 // Exercício 1
 typedef struct abin {
     char *pal;
