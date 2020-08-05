@@ -1369,9 +1369,28 @@ void posorder (ABin a, LInt *l) {
     }
 }
 
-// Q34 -- help
+// Q34 -- stolen
 int depth (ABin a, int x) {
-    return -1;
+
+    if (!a) 
+        return -1;
+
+    if (a->valor == x) 
+        return 1;
+    
+    int esq = depth(a->esq, x);
+    int dir = depth(a->dir, x);
+
+    if (esq == -1 && dir == -1)
+        return -1;
+    
+    if (esq == -1) 
+        return 1 + dir;
+    
+    if (dir == -1)
+        return 1 + esq;
+
+    return esq < dir ? 1 + esq : 1 + dir;
 }
 
 // Q35
@@ -1556,9 +1575,23 @@ int lookupAB (ABin a, int x) {
     return ans;
 }
 
-// Q46 -- help
+// Q46
 int depthOrd (ABin a, int x) {
-    return 0;
+    int ans = -1, count = 0;
+    int dif = 1;
+
+    while (a && dif) {
+        dif = x - a->valor;
+        if (dif < 0)
+            a = a->esq;
+        else if (dif > 0)
+            a = a->dir; 
+        count++;
+    }
+    if (!dif) 
+        ans = count;
+
+    return ans;
 }
 
 // Q47
@@ -1589,16 +1622,56 @@ int quantosMaiores (ABin a, int x) {
 
 // Q50
 void listToBTree (LInt l, ABin *a) {
-    return ;
+    int mid = length(l)>>1;
+    LInt aux = l, back = NULL;
+
+    if (!aux) {
+        *a = NULL;
+        return ;
+    }
+
+    for (; mid; mid--, back = aux, aux = aux->prox);
+
+    ABin new = malloc(sizeof(struct nodo));
+    new->valor = aux->valor;
+    new->esq = new->dir = NULL;
+
+    if (back) {
+        back->prox = NULL;
+    }
+    else 
+        l = NULL;
+    
+
+    listToBTree(l, &(new->esq));
+    listToBTree(aux->prox, &(new->dir));
+    *a = new;
 }
 
 // Q51
 
-// main 
+// Testes
+
+void printTree(ABin a) {
+    if (a) {
+        printTree(a->esq);
+        printf("%d ", a->valor);
+        printTree(a->dir);
+    }
+}
 
 int main() {
-    printf("Largest Element: %d\n", largestElem());
+  /*  printf("Largest Element: %d\n", largestElem());
     printf("Average: %d\n", average());
     printf("Second Largest Element: %d\n", secondLargest());
+*/
+    int v[10] = {1,2,3,4,5,6,7,8,9,10};
+    LInt l = arrayToList(v, 10);
+    ABin a = NULL;
+    listToBTree(l, &a);
+    
+    printTree(a);
+    putchar('\n');
+
     return 0;
 }
