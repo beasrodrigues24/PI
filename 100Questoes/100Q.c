@@ -1664,6 +1664,14 @@ void printTree(ABin a) {
     }
 }
 
+void printLista(LInt l) {
+
+    for (LInt aux = l; aux; aux = aux->prox)
+        printf("%d ", aux->valor);
+
+    putchar('\n');
+}
+
 int main() {
     printf("Largest Element: %d\n", largestElem());
     printf("Average: %d\n", average());
@@ -1674,7 +1682,11 @@ int main() {
     LInt l = arrayToList(v, 10);
     ABin a = NULL;
     listToBTree(l, &a);
-    
+
+    LInt r = NULL;
+    posorder(a, &r);
+    printLista(r);
+
     printTree(a);
     putchar('\n');
 
