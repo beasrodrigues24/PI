@@ -34,7 +34,6 @@ int remRep (char x[]) {
 
 // Exercício 3
 
-
 typedef struct nodo {
     int valor;
     struct nodo *esq, *dir;
