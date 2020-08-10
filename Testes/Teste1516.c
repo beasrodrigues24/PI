@@ -211,7 +211,7 @@ int main() {
     m->lcol->coluna = 2;
     m->lcol->prox = NULL;
 
-    printf("Inserido em m %f\n", getEntry(m, 1, 2));
+    printf("Está em m %f\n", getEntry(m, 1, 2));
     setEntry(&m, 3, 4, 1.70);
     printf("Inserido em m %f\n", getEntry(m,3,4));
     setEntry(&m, 1, 1, 1.23);

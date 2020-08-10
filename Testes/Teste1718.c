@@ -188,9 +188,67 @@ void removeMin (ABin *a) {
     }
 }
 
-void add (ABin *a, int x) {
+void add (ABin *a, int x) { // STOLEN
+    ABin new = malloc(sizeof(struct nodo));
+    new->esq = new->dir = NULL;
 
+    if (!(*a))
+        *a = new;
+    else {
+        if(!(*a)->esq) {
+            if(x > (*a)->valor) add(&((*a)->esq),x);
+            else {
+                new->esq = (*a);
+                new->dir = (*a)->dir;
+                (*a)->dir = NULL;
+                (*a) = new;
+            }
+        }
+        else if(!(*a)->dir) {
+            if(x > (*a)->valor) add(&((*a)->dir),x);
+            else {
+                new->esq = (*a)->esq;
+                (*a)->esq = NULL;
+                new->dir = (*a);
+                (*a) = new;
+            }
+        }
+        else {
+            if(x > (*a)->dir->valor) add(&((*a)->dir),x);
+            else if(x > (*a)->esq->valor) add(&((*a)->esq),x);
+            else {
+                ABin new = malloc(sizeof(struct nodo));
+                new->valor = x;
+                if(x < (*a)->valor) {
+                    new->esq = (*a);
+                    (*a) = new;
+                }
+                else {
+                    new->esq = (*a)->esq;
+                    (*a)->esq = new;
+                }
+                new->dir = NULL;
+            }
+        }
+    }
 }
+
+void heapSort (int v[], int N) { // ERRADO
+    int i;
+    ABin a = NULL;
+
+    for (i = 0; i < N; i++)
+        add(&a, v[i]);
+    
+    for (i = 0; i < N; i++) {
+        v[i] = a->valor;
+        removeMin(&a);
+    }
+}
+
+// Exercício 5
+
+
 
 // TESTES
 
@@ -271,5 +329,9 @@ int main() {
     printf("O maior elemento é %d!\n", maxHeap(new));
     removeMin(&new);
     drawsABin(new);
+
+    int r[12] = {4,-1, 4, 5, 2, -4, 8, 1, 7, -3, -1, 4};
+    heapSort(r, 12);
+    printArray(r, 12);
     
 }
