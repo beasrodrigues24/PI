@@ -389,7 +389,7 @@ int limpaEspacos (char t[]) {
 void insere (int v[], int N, int x) {
     int i;
 
-    for (i = 0; v[i] && v[i] < x; i++);
+    for (i = 0; i < N && v[i] < x; i++);
     
     for (; i<N; N--)
         v[N] = v[N-1];
