@@ -830,7 +830,7 @@ void imprimeL (LInt l) {
     LInt aux = l;
 
     while (aux) {
-        printf("%d", l->valor);
+        printf("%d", aux->valor);
         aux = aux->prox; 
     }
 }
@@ -1547,6 +1547,25 @@ ABin cloneMirror (ABin a) {
 }
 
 // Q44
+int addOrdRec (ABin *a, int x) {
+    
+    if (!(*a)) {
+        ABin new = malloc(sizeof(struct nodo));
+        new->valor = x;
+        new->esq = new->dir = NULL;
+        *a = new;
+        return 0;
+    }
+    else if (x < (*a)->valor) 
+        return addOrdRec(&(*a)->esq, x);
+
+    else if (x > (*a)->valor)
+        return addOrdRec(&(*a)->dir, x);
+    
+    else 
+        return 1;   
+}
+
 int addOrd (ABin *a, int x) {
     while (*a) {
         if (x < (*a)->valor)
