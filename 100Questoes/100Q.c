@@ -982,96 +982,91 @@ int removeAll (LInt *l, int x) {
 
 // Q11
 int removeDups (LInt *l) {
-    LInt aux = *l, back = NULL, elim;
-    int counter = 0;
+    LInt back = NULL;
+    int count = 0;
 
-    for (; aux; aux = aux->prox) {
-        back = aux;
-        for (elim = aux->prox; elim;) {
-            if (aux->valor == elim->valor) {
-                back->prox = elim->prox;
-                free(elim);
-                elim = back->prox;
-                counter++;
+    for (; *l; l = &(*l)->prox) {
+        back = *l;
+        LInt next;
+        for (next = (*l)->prox; next;) {
+            if ((*l)->valor == next->valor) {
+                back->prox = next->prox;
+                LInt temp = next;
+                next = next->prox;
+                free(temp);
+                count++;
             }
             else {
-                back = elim;
-                elim = elim->prox;
+                back = next;
+                next = next->prox;
             }
         }
     }
 
-    return counter;
-} 
+    return count;
+}
 
 // Q12
 int removeMaiorL (LInt *l) {
-    LInt aux = *l, back = NULL;
-    int bigger = -1;
+    int maior;
+    LInt back = NULL;
     if (*l) {
-        bigger = (*l)->valor;
-
-        for (; aux; aux = aux->prox) 
-            if (aux->valor > bigger)
-                bigger = aux->valor;
+        maior = (*l)->valor;
+        for (LInt curs = (*l)->prox; curs; curs = curs->prox) 
+            if (curs->valor > maior) 
+                maior = curs->valor;
         
-        for (aux = *l; aux && aux->valor != bigger; aux = aux->prox) 
-            back = aux;
-        
-        if (!back)
+        for (; *l && (*l)->valor != maior; back = *l, l = &(*l)->prox);
+        LInt temp = *l;
+        if (!back) {
             *l = (*l)->prox;
-        else {
-            back->prox = aux->prox;
-            free(aux);
         }
-        
+        else {
+            temp = *l;
+            back->prox = (*l)->prox;
+        }
+        free(temp);
     }
-    return bigger;
+    return maior;
 }
 
 // Q13
 void init (LInt *l) {
-    LInt aux = *l, back = NULL;
-
-    if (aux) {
-        for (; aux->prox; back = aux, aux = aux->prox);
-        
+    if (*l) {
+        LInt back = NULL;
+        for (; *l && (*l)->prox; back = *l, l = &(*l)->prox);
         if (!back) {
             free(*l);
             *l = NULL;
         }
         else {
             back->prox = NULL;
-            free(aux);
+            free(*l);
         }
     }
 }
 
+
 // Q14
 void appendL (LInt *l, int x) {
-    LInt aux = *l;
-    LInt temp = malloc(sizeof(struct lligada));
-    temp->valor = x;
-    temp->prox = NULL;
-    
-    if (aux) {
-        for (; aux->prox; aux = aux->prox);
-        aux->prox = temp;
+    LInt new = malloc(sizeof(struct lligada));
+    new->valor = x;
+    new->prox = NULL;
+    if (!(*l))
+        *l = new;
+    else {
+        for (; *l && (*l)->prox; l = &(*l)->prox);
+        (*l)->prox = new;
     }
-    else
-        *l = temp;
 }
 
 // Q15
 void concatL (LInt *a, LInt b) {
-    LInt aux = *a;
-    if (aux) {
-        for (; aux->prox; aux = aux->prox);
-        aux->prox = b;
-    }
-    else {
+    for (; *a && (*a)->prox; a = &(*a)->prox);
+    if (!(*a))
         *a = b;
-    }
+    else 
+        (*a)->prox = b;
 }
 
 // Q16
@@ -1089,6 +1084,20 @@ LInt cloneL (LInt l) {
         new->prox = NULL;
     }
 
+    return head;
+}
+
+LInt cloneLSemMalloc (LInt l) {
+    LInt newL = NULL, head = NULL;
+
+    for (; l; l = l->prox) {
+        newL = l;
+        if (!head) 
+            head = l;
+        newL = newL->prox;
+    }
+    newL = NULL;
+        
     return head;
 }
 
@@ -1123,21 +1132,17 @@ int maximo (LInt l) {
 
 // Q19
 int take (int n, LInt *l) {
-    LInt aux = *l, back = NULL;
     int counter = 0;
 
-    for (; aux && n; n--, counter++, back = aux, aux = aux->prox);
-    
-    if (!n) {
-        back->prox = NULL;
-        while (aux) {
-            LInt temp = aux->prox;
-            free(aux);
-            aux = temp;
-            
+    for (; n > 0 && *l; n--, l = &(*l)->prox, counter++);
+    if (*l) {
+        while (*l) {
+            LInt front = (*l)->prox;
+            free(*l);
+            *l = NULL;
+            *l = front;
         }
     }
-
     return counter;
 }
 
@@ -1215,39 +1220,32 @@ LInt somasAcL (LInt l) {
 
 // Q25
 void remreps (LInt l) {
-    LInt back = NULL, aux = l, elim;
+    LInt back = NULL;
 
-    for (; aux; aux = aux->prox) {
-        back = aux;
-        elim = aux->prox;
-        
-        while (elim) {
-            
-            if (elim->valor == aux->valor) {
-                back->prox = elim->prox;
-                free(elim);
-                elim = back->prox;
-            }
-            else 
-                elim = elim->prox;
+    while (l) {
+        LInt curs, front;
+        back = l;
+        for (curs = l->prox; curs && curs->valor == l->valor; curs = front) {
+            front = curs->prox;
+            back->prox = curs->prox;
+            free(curs);
         }
+        l = l->prox;
     }
 }
 
 // Q26
 LInt rotateL (LInt l) {
-    LInt aux = l, new_head = l;
+    if (!l || !(l->prox)) 
+        return l;
+    
+    LInt init = l;
+    LInt sec = l->prox;
+    for (; l && l->prox; l = l->prox);
+    l->prox = init;
+    init->prox = NULL;
 
-    if (aux) {
-        if (aux->prox)
-            new_head = aux->prox;
-        while (aux->prox) 
-            aux = aux->prox;
-        aux->prox = l;
-        l->prox = NULL;
-    }
-
-    return new_head;
+    return sec;
 }
 
 // Q27
@@ -1484,15 +1482,16 @@ int nivelV (ABin a, int n, int v[]) {
 
 // Q40
 int dumpAbin (ABin a, int v[], int N) {
-    if (a && N) {
-        int e = dumpAbin(a->esq, v, N);
-        if (e < N) {
-            *(v+e) = a->valor;
-            return e + dumpAbin(a->dir, v+e+1, N-e-1) + 1;
-        }
-        else return N;
+    if (!a || N < 0)
+        return 0;
+    
+    int esq = dumpAbin(a->esq, v, N);
+    if (esq < N) {
+        *(v+esq) = a->valor;
+        return esq + dumpAbin(a->dir, v+esq+1, N-esq-1) + 1;
     }
-    else return 0;
+    else 
+        return N;
 }
 
 // Q41
@@ -1567,19 +1566,23 @@ int addOrdRec (ABin *a, int x) {
 }
 
 int addOrd (ABin *a, int x) {
-    while (*a) {
+    int isThere = 0;
+    while (*a && !isThere) {
         if (x < (*a)->valor)
             a = &(*a)->esq;
         else if (x > (*a)->valor)
             a = &(*a)->dir;
         else 
-            return 1;
+            isThere = 1;
     }
-    ABin new = malloc(sizeof(struct nodo));
-    new->valor = x;
-    new->esq = new->dir = NULL; 
-    *a = new;
-    return 0;
+    
+    if (!isThere) {
+        *a = malloc(sizeof(struct nodo));
+        (*a)->valor = x;
+        (*a)->esq = (*a)->dir = NULL;
+    }
+
+    return isThere;
 }
 
 // Q45
@@ -1600,21 +1603,19 @@ int lookupAB (ABin a, int x) {
 
 // Q46
 int depthOrd (ABin a, int x) {
-    int ans = -1, count = 0;
-    int dif = 1;
+    int dep = 0, isThere = 0;
 
-    while (a && dif) {
-        dif = x - a->valor;
-        if (dif < 0)
+    while (a && !isThere) {
+        dep++;
+        if (x < a->valor)
             a = a->esq;
-        else if (dif > 0)
-            a = a->dir; 
-        count++;
+        else if (x > a->valor)
+            a = a->dir;
+        else 
+            isThere = 1;
     }
-    if (!dif) 
-        ans = count;
 
-    return ans;
+    return (isThere ? dep : -1);
 }
 
 // Q47
