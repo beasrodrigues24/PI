@@ -158,15 +158,10 @@ typedef struct sturma {
     struct sturma *prox;
 }*Turma;
 
-Aluno newAluno (char *nome, int numero, int nota){
-	Aluno novo;
-    memcpy(novo.nome, nome, 59);
-    novo.nome[60] = '\0';
-
-    novo.nota = nota;
-    novo.numero = numero;
-    
-    return novo;
+Aluno newAluno (char *nome, int numero, int nota) {
+    Aluno new = {.numero = numero, .nota = nota};
+    strcpy(new.nome, nome);
+    return new;
 }
 
 Turma vazia () {
@@ -174,23 +169,18 @@ Turma vazia () {
 }
 
 int acrescentaAluno (Turma *t, Aluno a) {
-    Turma new = malloc(sizeof (struct sturma));
-    
+    Turma new = malloc(sizeof(struct sturma));
     new->aluno = a;
-    new->prox = NULL;
-
-    if (!(*t)) 
-        *t = new;
-    else {
-        for (; (*t)->prox; t = &(*t)->prox);
-        (*t)->prox = new;
-    }
-
-    return (!new);
+    
+    for (; *t && a.numero > (*t)->aluno.numero; t = &(*t)->prox);
+    Turma temp = *t;
+    *t = new;
+    (*t)->prox = temp;
+    return 0;
 }
 
-Aluno *procura (Turma t, int numero) {
-    Aluno * ret = NULL;
+Aluno *procura1 (Turma t, int numero) {
+    Aluno *ret = NULL;
 
     if (t) {
         for (; t && !ret; t = t->prox)
@@ -198,6 +188,15 @@ Aluno *procura (Turma t, int numero) {
                 ret = &(t->aluno);
     }
 
+    return ret;
+}
+
+Aluno *procura (Turma t, int numero) {
+    Aluno *ret = NULL;
+
+    for (; t && t->aluno.numero < numero; t = t->prox);
+    if (t->aluno.numero == numero) 
+        ret = &(t->aluno);
     return ret;
 }
 
@@ -226,11 +225,13 @@ int isEmptyS (Stack *s) {
 int push (Stack *s, int x) {
     
     Stack temp = malloc (sizeof (struct slist));
+    if (!temp) 
+        return 1;
     temp->valor = x;
     temp->prox = *s;
     *s = temp;
 
-    return (!temp);
+    return 0;
 }
 
 int pop (Stack *s, int *x) {
@@ -277,31 +278,31 @@ int enqueue (Queue *q, int x) {
     LInt new = malloc(sizeof(struct slist));
     new->valor = x;
     new->prox = NULL;
+    
+    if (!new) 
+        return 1;
 
     if (!(q->front)) 
         q->front = q->last = new;
          
-    else {
-        q->last->prox = new;
-        q->last = new;
-    }
+    else 
+        q->last = q->last->prox = new;
+    
 
-    return (new == NULL);
+    return 0;
 }
 
 int dequeue (Queue *q, int *x) {
-    int ans = 0;
+    int ans = 1;
 
-    if (!(q->front)) // Vazia
-        ans = 1;
-
-    else {
+    if (q->front) {
         *x = q->front->valor;
-        if (q->front == q->last) // Só 1 elemento
-            q->last = NULL;
         LInt temp = q->front;
         q->front = q->front->prox;
+        if (!(q->front))
+            q->last = NULL;
         free(temp);
+        ans = 0;
     }
 
     return ans;
@@ -326,18 +327,11 @@ typedef struct dlist {
 } NodoD;
 
 void inicio (DLInt *l) {
-
-    if (*l) {
-        while ((*l)->ant) 
-            *l = (*l)->ant;
-    }
+    for (; *l && (*l)->ant; *l = (*l)->ant);
 }
 
 void fim (DLInt *l) {
-    if (*l) {
-        while ((*l)->prox) 
-            *l = (*l)->prox;
-    } 
+    for (; *l && (*l)->prox; *l = (*l)->prox);
 }
 
 void concatDL (DLInt *a, DLInt b) {
@@ -356,11 +350,9 @@ LInt toLInt (DLInt l) {
         temp->valor = l->valor;
         temp->prox = NULL;
         if (!head) 
-            head = temp;
-        else {
-            list->prox = temp;
-            list = list->prox;
-        }
+            head = list = temp;
+        else 
+            list = list->prox = temp;
     }
 
     return head;
@@ -374,16 +366,11 @@ DLInt fromLInt (LInt l) {
         new->ant = back;
         new->valor = l->valor;
         new->prox = NULL;
-        if (!head) {
-            head = new;
-            list = new;
-            back = list;
-        }
-        else {
-            list->prox = new;
-            back = new;
-            list = list->prox;
-        }
+        if (!head) 
+            back = list = head = new;
+        
+        else 
+            back = list = list->prox = new;
     }
 
     return head;
@@ -594,12 +581,16 @@ int main() {
 
     printTurma(t);
 
-    if (procura (t, 4442) != NULL) 
-    	printf ("Encontrou\n");
+    Aluno* al;
+    al = procura (t, 4442);
+    if (al) 
+    	printf ("Encontrou: %s %d\n", al->nome, al->nota);
     else printf ("Erro na procura\n");
 
-    if (procura (t, 4545) != NULL) 
-    	printf ("Erro na procura\n");
+    al = procura (t, 4545);
+    if (al) 
+    	printf ("Encontrou: %s %d\n", al->nome, al->nota);
+    else printf ("Erro na procura\n");
 
     printf ("%d aprovados\n", aprovados (t));
 
