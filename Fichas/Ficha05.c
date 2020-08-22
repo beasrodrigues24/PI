@@ -8,16 +8,21 @@
 
 // Exercício 1
 void insere (int v[], int N, int x) {
-    int i;
+    int flag = 1;
 
-    for (i = 0; i < N && v[i] < x; i++);
-    
-    for (; i < N; N--)
-        v[N] = v[N-1];
-    
-    v[i] = x;
+    for(int i = 0; i < N && flag; i++) {
+        if(v[i] > x) {
+            for(int j = N; j > i; j--) {
+                v[j] = v[j - 1];
+            }
+            v[i] = x;
+            flag = 0;
+        }
+        if(i == N - 1) {
+            v[N] = x;
+        }
+    }
 }
-
 
 // Exercício 2
 void iSort1 (int v[], int N) {

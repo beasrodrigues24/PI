@@ -62,26 +62,26 @@ int secondLargest() {
 int bitsUm (unsigned int n) {
     int count = 0;
     
-    while (n) {
-        if (n%2) 
-            count++;
-        n /= 2;
-    }
+    for (; n > 0; n >>= 1)
+        count += n%2;
 
     return count;
 }
 
-// Q5 -- duvida
+// Q5
 int trailingZ (unsigned int n) {
+    if (n == 0)
+        return 32;
     int count = 0;
-
-    while (n) {
-        if (n%2 == 0) 
+    
+    while (n > 0) {
+        if (n%2 == 0)
             count++;
-        n /= 2;
+        n >>= 1;
     }
     return count;
 }
+
 
 // Q6
 int qDig (unsigned int n) {
@@ -146,16 +146,15 @@ char *mystrstr (char s1[], char s2[]) {
 
 // Q11
 void strrev (char s[]) {
-    int length, i;
+    int i,j;
     
-    for (length = 0; s[length]; length++);
-  
-    for (i = 0; i<length; i++) {
-        length--;
-        char temp = s[length];
-        s[length] = s[i];
+    for (i = 0; s[i]; i++);
+    i--;
+    
+    for (j = 0; j < i; j++, i--) {
+        char temp = s[j];
+        s[j] = s[i];
         s[i] = temp;
-       
     }
 }
 
@@ -173,13 +172,12 @@ int isVogal(char c) {
 void strnoV (char s[]) {
     int i, j;
 
-    for (i = 0; s[i]; i++) {
+    for (i = 0; s[i]; i++) 
         if (isVogal(s[i])) {
             for (j = i; s[j]; j++) 
                 s[j] = s[j+1];
             i--;
-        }
-    }
+        }  
 }
 
 // Q13
@@ -224,19 +222,15 @@ char charMaisfreq (char s[]) {
 
 // Q15
 int iguaisConsecutivos (char s[]) {
-    int i, count = 1, res = 0;
-
-    for (i = 0; s[i]; i++) {
-        if (s[i] == s[i+1])
-            count++;
-        else if (count > res) {
-            res = count;
-            count = 1;
-        }
-        
-    }
+    int i, j, streak = 1, max = 0;
     
-    return res;
+    for (i = 0; s[i]; i = ++j) {
+        for (j = i; s[j] && s[j] == s[j+1]; j++, streak++);
+        if (streak > max)
+            max = streak;
+        streak = 1;
+    }
+    return max;
 }
 
 // Q16 -- stolen
@@ -305,16 +299,16 @@ int sufPref (char s1[], char s2[]) {
 
 // Q20
 int contaPal (char s[]) {
-    int i, count = 0;
-    char c = ' ';
-
-    for (i=0; s[i]; i++) {
-        if (s[i] != ' ' && c == ' ' && s[i] != '\n')
+    int inWord = 0, i, j, count = 0;
+    
+    for (i = 0; s[i]; i++) {
+        if (inWord && s[i] == ' ')
+            inWord = 0;
+        else if (!inWord && s[i] != ' ' && s[i] != '\n') {
+            inWord = 1;
             count++;
-
-        c = s[i];
+        }
     }
-
     return count;
 }
 
@@ -344,16 +338,29 @@ int contida (char a[], char b[]) {
     return ans;
 }
 
-// Q23
-int palindorome (char s[]) {
-    int i, len, ans = 1;
-    for (len = 0; s[len]; len++);
-    len--;
-
-    for (i = 0; s[i] && ans; i++)
-        if (s[i] != s[len-i])
+int contida2 (char a[], char b[]) {
+    int i, j, ans = 1;
+    
+    for (i = 0; a[i] && ans; i++) {
+        for (j = 0; b[j] && a[i] != b[j]; j++);
+        if (!b[j])
             ans = 0;
+    }
+    
+    return ans;
+}
 
+// Q23
+int palindroma (char s[]) {
+    int i, j, ans = 1;
+    
+    for (i = 0; s[i]; i++);
+    i--;
+    
+    for (j = 0; j < i && ans; j++, i--)
+        if (s[j] != s[i])
+            ans = 0;
+            
     return ans;
 }
 
@@ -385,41 +392,36 @@ int limpaEspacos (char t[]) {
     return i;
 }
 
-// Q26
+// Q26 -- stolen
 void insere (int v[], int N, int x) {
-    int i;
-
-    for (i = 0; i < N && v[i] < x; i++);
-    
-    for (; i<N; N--)
-        v[N] = v[N-1];
-    
-    v[i] = x;
+    for(int i = 0; i < N; i++) {
+        if(v[i] > x) {
+            for(int j = N; j > i; j--) {
+                v[j] = v[j - 1];
+            }
+            v[i] = x;
+            break;
+        }
+        if(i == N - 1) {
+            v[N] = x;
+        }
+    }
 }
 
 // Q27
-void merge (int r [], int a[], int b[], int na, int nb) {
-    int ca, cb, i;
-    for (ca = 0, cb = 0, i = 0; ca < na && cb < nb; i++) {
-        if (a[ca] < b[cb]) {
-            r[i] = a[ca];
-            ca++;
-        }
-        else {
+void merge (int r [], int a[], int b[], int na, int nb){
+    int i, ca, cb;
+    
+    for (i = ca = cb = 0; i < na + nb; i++) {
+        if ((ca < na && cb < nb && b[cb] < a[ca]) || ca >= na) {
             r[i] = b[cb];
             cb++;
         }
-    }
-    if (!(ca < na))
-        for (; cb < nb; i++, cb++) 
-            r[i] = b[cb];
-         
-    
-
-    else 
-        for (; ca < na; i++, ca++) 
+        else {
             r[i] = a[ca];
-
+            ca++;
+        }
+    }
 }
 
 // Q28
@@ -451,73 +453,47 @@ int retiraNeg (int v[], int N) {
 }
 
 // Q30
-int menosFreq (int v[], int N) {
-    int i, count = 1, freq = N, imf = v[0];
-
-    for (i = 1; i < N; i++) {
-        if (v[i-1] == v[i])
-            count++;
-        else {
-            if (count < freq) {
-                freq = count;
-                imf = v[i-1];
-            }
-            count = 1;
+int menosFreq (int v[], int N){
+    int i, j, count = 1, min = N, mf = v[0];
+    
+    for (i = 0; i < N; i = j) {
+        for (j = i+1; j < N && v[i] == v[j]; j++, count++);
+        if (count < min) {
+            min = count;
+            mf = v[i];
         }
-
+        count = 1;
     }
-
-    if(count < freq) {
-        freq = count;
-        imf = v[i-1];
-    }
-
-    return imf;
+    return mf;
 }
 
 // Q31
-int maisFreq (int v[], int N) {
-    int i, count = 1, freq = 1, mf = v[0];
-
-    for (i = 1; i < N; i++) {
-        if (v[i] == v[i-1]) 
-            count++;
-        else {
-            if (count > freq) {
-                freq = count;
-                mf = v[i-1];
-                
-            }
-            count = 1;
-        }    
-    }
-    if(count > freq) {
-        freq = count;
-        mf = v[i-1];
+int maisFreq (int v[], int N){
+    int i, j, max = 0, count = 1, mf = v[0];
+    
+    for (i = 0; i < N; i = j) {
+        for (j = i+1; j < N && v[j] == v[i]; j++, count++);
+        if (count > max) {
+            max = count;
+            mf = v[i];
+        }
+        count = 1;
     }
 
     return mf;
 }
 
+
 // Q32
 int maxCresc (int v[], int N) {
-    int i, count = 1, max = 0;
-
-    for (i = 1; i < N; i++) {
-        if (v[i] >= v[i-1])
-            count++;
-        else {
-            if (count > max)
-                max = count;
-            count = 1;
-        }
+    int i, j, count = 1, max = 0;
+    
+    for (i = 0; i < N; i++) {
+        for (j = i+1; j < N && v[j] >= v[j-1]; j++, count++);
+        if (count > max) 
+            max = count;
+        count = 1;
     }
-    
-    if (v[i] > v[i-1])
-        count++;
-    else if (count > max)
-        max = count;
-    
     return max;
 }
 
@@ -542,13 +518,13 @@ int elimRepOrd (int v[], int n) {
     int i, j, l;
 
     for (i = 0; i < n; i++) 
-        for (j = i+1; j < n && v[i] <= v[j]; j++)
-            if (v[i] == v[j]) {
-                for (l = j; l < n; l++) 
-                    v[l] = v[l+1];
-                j--;
-                n--;
-            }
+        for (j = i+1; j < n && v[i] == v[j]; j++) {
+           for (l = j; l < n; l++) 
+                v[l] = v[l+1];
+            j--;
+            n--;
+        }
+            
     
     return i;   
 }
@@ -586,16 +562,19 @@ int comuns (int a[], int na, int b[], int nb) {
 
 // Q37
 int minInd (int v[], int n) {
-    int i, min = 0, number = v[0];
-
-    for (i = 1; i < n; i++) 
-        if (v[i] < number) {
-            number = v[i];
-            min = i;
-        }
-            
-
-    return min;
+   int r = -1, i, min;
+   
+   for (i = 0; i < n; i++) {
+       if (!i) {
+           r = 0;
+           min = v[0];
+       }
+       else if (v[i] < min) {
+           min = v[i];
+           r = i;
+       }
+   }
+   return r;
 }
 
 // Q38
@@ -677,7 +656,7 @@ int intersectMSet (int N, int v1[N], int v2[N], int r[N]){
         
         if (v1[i] && v2[i]) {
             if (v1[i] > v2[i])
-                    r[i] = v2[i];
+                r[i] = v2[i];
             else 
                 r[i] = v1[i];
         }
@@ -690,7 +669,6 @@ int intersectMSet (int N, int v1[N], int v2[N], int r[N]){
 int unionMSet (int N, int v1[N], int v2[N], int r[N]) {
     int i;
     for (i = 0; i < N; i++) {
-        
         if (v1[i]>v2[i]) 
             r[i] = v1[i]; 
         else r[i] = v2[i];
