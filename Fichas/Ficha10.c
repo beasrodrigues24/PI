@@ -19,92 +19,66 @@ typedef struct arv {
 
 // Exercício 1 
 
-int acrescentaAluno(Turma *t, Aluno a) {
-    Turma aux = *t, back = NULL;
-    int dif = 1, ans = 0;
+int acrescentaAluno (Turma *t, Aluno a) {
+    int flag = 1;
 
-    while (aux && dif) {
-        back = aux;
-        dif = aux->a.numero - a.numero;
-        if (dif > 0) 
-            aux = aux->esq;
-        else if (dif < 0)
-            aux = aux->dir;
-
+    while (*t && flag) {
+        int cmp = (*t)->a.numero - a.numero;
+        if (cmp < 0)
+            t = &(*t)->dir;
+        else if (cmp > 0)
+            t = &(*t)->esq;
+        else 
+            flag = 0;
     }
 
-    if (!dif) 
-        ans = 1;
-    
-    else {
-        Turma new = malloc(sizeof(struct arv));
-        new->a = a;
-        new->esq = NULL;
-        new->dir = NULL;
-        if (!back) 
-            *t = new;
-        else {
-            if (back->a.numero < new->a.numero)
-                back->dir = new;
-            else 
-                back->esq = new;
-        }
+    if (!(*t)) {
+        *t = malloc(sizeof(struct arv));
+        (*t)->a = a;
+        (*t)->esq = (*t)->dir = NULL;
     }
 
-    return ans;
+    return !flag;
 }
 
 // Extra: Ordem alfabética 
 int acrescentaAlunoAlfabetica (Turma *t, Aluno a) {
-    Turma aux = *t, back = NULL;
-    int dif = 1, ans = 0;
+    int flag = 1;
 
-    while (aux && dif) {
-        back = aux;
-        dif = strcmp (aux->a.nome, a.nome);
-        if (dif < 0)
-            aux = aux->dir;
-        else if (dif > 0)
-            aux = aux->esq;
+    while (*t && flag) {
+        int cmp = strcmp((*t)->a.nome, a.nome);
+        if (cmp < 0)
+            t = &(*t)->dir;
+        else if (cmp > 0)
+            t = &(*t)->esq;
+        else 
+            flag = 0;
     }
 
-    if (!dif)
-        ans = 1;
-    else {
-        Turma new = malloc(sizeof(struct arv));
-        new->a = a;
-        new->esq = NULL;
-        new->dir = NULL;
-        if (!back) 
-            *t = new;
-        else {
-            if (strcmp(back->a.nome, new->a.nome) < 0)
-                back->dir = new;
-            else 
-                back->esq = new;
-        }
-            
+    if (!(*t)) {
+        *t = malloc(sizeof(struct arv));
+        (*t)->a = a;
+        (*t)->esq = (*t)->dir = NULL;
     }
-    return ans;
+
+    return !flag;
 }
 
 Aluno *procura (Turma t, int numero) {
-    Turma aux = t;
-    int dif = 1;
-    Aluno *ans = NULL;
-    while (aux && dif) {
-        dif = aux->a.numero - numero;
-        if (dif > 0)
-            aux = aux->esq;
-        else if (dif < 0)
-            aux = aux->dir;
+    int flag = 1;
+    Aluno* ret = NULL; 
+    while (t && flag) {
+        int cmp = t->a.numero - numero;
+        if (cmp < 0) 
+            t = t->dir;
+        else if (cmp > 0)
+            t = t->esq;
+        else {
+            flag = 0;
+            ret = &(t->a);
+        }
     }
-
-    if (!dif)
-        ans = &(aux->a);
-
-    return ans;
-
+    return ret;
 }
 
 int aprovados (Turma t) {
@@ -116,12 +90,11 @@ int aprovados (Turma t) {
 }
 
 void printTurma (Turma t) {
-    Turma aux = t;
 
-    if (aux) {
-        printTurma(aux->esq);
+    if (t) {
+        printTurma(t->esq);
         printf("Aluno %s, de número %d, tem nota %d.\n", t->a.nome, t->a.numero, t->a.nota);
-        printTurma(aux->dir);
+        printTurma(t->dir);
     }
 }
 

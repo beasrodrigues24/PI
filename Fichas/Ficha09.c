@@ -15,7 +15,31 @@ void initDic (Dicionario *d) {
     *d = NULL;
 }
 
-int acrescenta (Dicionario *d, char *pal) { // Usei ordem alfabética
+int acrescenta (Dicionario *d, char *pal) {
+    int flag = 1, ret = 1;
+    while (*d && flag) {
+        int r = strcmp((*d)->pal, pal);
+        if (r < 0)
+            d = &(*d)->dir;
+        else if (r > 0)
+            d = &(*d)->esq;
+        else {
+            flag = 0;
+            ret = ++(*d)->ocorr;
+        }
+    }
+
+    if (!(*d)) {
+        *d = malloc(sizeof(struct abin));
+        (*d)->pal = strdup(pal);
+        (*d)->ocorr = 1;
+        (*d)->esq = (*d)->dir = NULL;
+    }
+
+    return ret;
+}
+
+int acrescentaCAux (Dicionario *d, char *pal) {
     Dicionario aux = *d, back = NULL;
     int ans = 1, flag = 1;
 
@@ -52,17 +76,16 @@ int acrescenta (Dicionario *d, char *pal) { // Usei ordem alfabética
 }
 
 char *maisFreq (Dicionario d, int *c) {
-    Dicionario aux = d;
-    char* mfq = " ", *mfqe = " ", *mfqd = " ";
+    char* mfq, *mfqe, *mfqd;
     int fe = 0, fd = 0;
 
-    if (aux) {
-        if (aux->ocorr > *c) {
-            *c = aux->ocorr;
-            mfq = aux->pal;
+    if (d) {
+        if (d->ocorr > *c) {
+            *c = d->ocorr;
+            mfq = d->pal;
         }
-        mfqe = maisFreq(aux->esq, &fe);
-        mfqd = maisFreq(aux->dir, &fd);
+        mfqe = maisFreq(d->esq, &fe);
+        mfqd = maisFreq(d->dir, &fd);
     }
 
     if (fe > *c) {
@@ -98,35 +121,29 @@ int length (LInt l) {
     return count;
 }
 
-int acrescentaElem (ABin* a, int x) {
-    ABin new = malloc(sizeof(struct abinaria));
-    if (new == NULL) 
-        return 1;
-    new->valor = x;
-    new->esq = NULL;
-    new->dir = NULL;
-
-    if (!(*a)) 
-        *a = new;
-    else {
-        ABin back = NULL, aux = *a;
-        while (aux) {
-            back = aux;
-            if (aux->valor < x) 
-                aux = aux->dir;
-            else if (aux->valor >= x)
-                aux = aux->esq;
-        }
-        if (back->valor < x) 
-            back->dir = new;
-        else
-            back->esq = new;
-    }
+int acrescentaElem (ABin *a, int x) {
+    int flag = 1;
     
-    return (!new);
-}
-ABin fromList (LInt l);
+    while (*a && flag) {
+        int r = (*a)->valor - x;
+        if (r < 0) 
+            a = &(*a)->dir;
+        else if (r > 0)
+            a = &(*a)->esq;
+        else 
+            flag = 0;
+    }
 
+    if (!(*a)) {
+        *a = malloc(sizeof(struct abinaria));
+        (*a)->valor = x;
+        (*a)->esq = (*a)->dir = NULL;
+    }
+
+    return !flag;
+}
+
+ABin fromList (LInt l);
 ABin fromListAux (LInt l, int cmp) {
     LInt aux = l, init = l;
     ABin new = NULL;
@@ -151,36 +168,6 @@ ABin fromList (LInt l) {
     return fromListAux (l, length(l));
 }
 
-/* FUNCIONA MAS PERDE A LISTA NECESSÁRIA PARA O TERCEIRO TESTE
-ABin fromList (LInt l) { 
-    LInt aux = l, init = l, back = NULL;
-    ABin new = NULL;
-    int mid = length(l)>>1;
-
-    if (aux) {
-
-        for (; mid; mid--) {
-            back = aux;
-            aux = aux->prox;
-        }
-
-        LInt rest = aux->prox;
-        
-        acrescentaElem(&new, aux->valor);
-        free(aux);
-        if (back)
-           back->prox = NULL;
-        if (!back)
-            init = NULL;
-
-        new->esq = fromList(init);
-        new->dir = fromList(rest);
-        
-    }
-    return new;
-}
-*/
-
 LInt inorderL (ABin a) {
     LInt l = NULL, aux;
 
@@ -194,14 +181,12 @@ LInt inorderL (ABin a) {
         LInt new = malloc(sizeof(struct lista));
         new->valor = a->valor;
         new->prox = NULL;
-        if (aux) {
-            aux->prox = new;
-            aux = aux->prox;
-        }
+        if (aux) 
+            aux = aux->prox = new;
         else {
-            aux = new;
-            l = new;
+            l = aux = new;
         }
+        
         aux->prox = inorderL(a->dir);
     }
 

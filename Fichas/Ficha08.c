@@ -17,6 +17,22 @@ void initDic (Dicionario *d) {
 }
 
 int acrescentaAlfabetica (Dicionario *d, char *pal) {
+    int ans = 1;
+
+    for (; *d && strcmp((*d)->palavra, pal) < 0; d = &(*d)->prox);
+    if (*d && !strcmp((*d)->palavra, pal))
+        ans = ++(*d)->ocorr;
+    else {
+        Dicionario new = malloc(sizeof(struct entrada));
+        new->palavra = strdup(pal);
+        new->prox = *d;
+        new->ocorr = 1;
+        *d = new;
+    }
+    return ans;
+}
+
+int acrescentaAlfabeticaCAux (Dicionario *d, char *pal) {
     Dicionario aux = *d, back = NULL;
     int ans = 1;
 
@@ -40,6 +56,24 @@ int acrescentaAlfabetica (Dicionario *d, char *pal) {
 }
 
 int acrescentaNoFim (Dicionario *d, char *pal) {
+    int ret = 1;
+    for (; *d && strcmp((*d)->palavra, pal); d = &(*d)->prox);
+    
+    if (*d)
+        ret = ++(*d)->ocorr;
+    else {
+        *d = malloc(sizeof(struct entrada));
+        if (!(*d))
+            return -1;
+        (*d)->palavra = strdup(pal);
+        (*d)->ocorr = 1;
+        (*d)->prox = NULL;
+    }
+
+    return ret;
+}
+
+int acrescentaNoFimCAux (Dicionario *d, char *pal) {
     Dicionario aux = *d;
     int ans = 1;
 
@@ -85,14 +119,14 @@ int acrescentaNoInicio (Dicionario *d, char *pal) {
 }
 
 char *maisFreq (Dicionario d, int *c) {
-    Dicionario aux = d;
+
     char* mfq = "error";
     *c = 0;
 
-    for (; aux; aux = aux->prox) {
-        if (aux->ocorr > *c) {
-            *c = aux->ocorr;
-            mfq = aux->palavra;
+    for (; d; d = d->prox) {
+        if (d->ocorr > *c) {
+            *c = d->ocorr;
+            mfq = d->palavra;
         }
     }
 
@@ -101,8 +135,8 @@ char *maisFreq (Dicionario d, int *c) {
 
 // TESTES
 void listaDicionario (Dicionario d){
-    for (Dicionario aux = d; aux; aux = aux->prox)
-        printf ("%s ocorre %d vezes\n", aux->palavra, aux->ocorr);
+    for (; d; d = d->prox)
+        printf ("%s ocorre %d vezes\n", d->palavra, d->ocorr);
 }
 
 int main() {
