@@ -147,7 +147,7 @@ int minheapOK (ABin a) {
 
 int maxHeap (ABin a) {
 
-    if (!(a->esq) && !(a->dir))
+    if (a && !(a->esq) && !(a->dir))
         return a->valor;
 
     int esq, dir;
@@ -157,8 +157,8 @@ int maxHeap (ABin a) {
     }
 
     if (esq > dir)
-            dir = esq;
-        return esq;
+        dir = esq;
+    return esq;
 }
 
 // Exercício 3
@@ -327,6 +327,13 @@ int main() {
 
 
     printf("O maior elemento é %d!\n", maxHeap(new));
+    printf("Remocao\n");
+    removeMin(&new);
+    drawsABin(new);
+    printf("Remocao\n");
+    removeMin(&new);
+    drawsABin(new);
+    printf("Remocao\n");
     removeMin(&new);
     drawsABin(new);
 
