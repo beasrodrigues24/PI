@@ -1079,43 +1079,29 @@ int listToArray (LInt l, int v[], int N) {
 }
 
 // Q23
-LInt arrayToList (int v[], int N) {
+LInt arrayToList (int v[], int N){
+    LInt head, *r = &head;
     int i;
-    LInt new, list = NULL, head = NULL;
     for (i = 0; i < N; i++) {
-        new = malloc(sizeof(struct lligada));
-        new->valor = v[i];
-        new->prox = NULL;
-        
-        if (!list) 
-            list = head = new;
-        else {
-            list->prox = new;
-            list = list->prox;
-        }  
+        *r = malloc(sizeof(struct lligada));
+        (*r)->valor = v[i];
+        r = &(*r)->prox;
     }
-
+    *r = NULL;
     return head;
 }
 
 // Q24
 LInt somasAcL (LInt l) {
+    LInt head, *r = &head;
     int acum = 0;
-    LInt list = NULL, head = NULL;
     for (; l; l = l->prox) {
         acum += l->valor;
-        LInt new = malloc(sizeof(struct lligada));
-        new->valor = acum;
-        new->prox = NULL;
-        
-        if (!list)
-            list = head = new;
-        else {
-            list->prox = new;
-            list = list->prox;
-        }
+        *r = malloc(sizeof(struct lligada));
+        (*r)->valor = acum;
+        r = &(*r)->prox;
     }
-
+    *r = NULL;
     return head;
 }
 
@@ -1135,18 +1121,35 @@ void remreps (LInt l) {
     }
 }
 
-// Q26
-LInt rotateL (LInt l) {
-    if (!l || !(l->prox)) 
-        return l;
+void remrepsAlt (LInt l){
     
-    LInt init = l;
-    LInt sec = l->prox;
-    for (; l && l->prox; l = l->prox);
-    l->prox = init;
-    init->prox = NULL;
+    for (; l; l = l->prox) {
+        LInt *r = &(l->prox);
+        while (*r) {
+            if ((*r)->valor == l->valor) {
+                LInt temp = *r;
+                *r = (*r)->prox;
+                free(temp);
+            }
+            else 
+                r = &(*r)->prox;
+        }
+    }
+}
 
-    return sec;
+// Q26
+LInt rotateL (LInt l){
+    LInt head = l;
+    
+    if (l && l->prox) {
+        LInt init = l;
+        l = head = l->prox;
+        for (; l && l->prox; l = l->prox);
+        l->prox = init;
+        init->prox = NULL;
+    }
+    
+    return head;
 }
 
 // Q27
@@ -1192,16 +1195,34 @@ LInt parte (LInt l) {
     return head;
 }
 
+LInt parteMelhorada (LInt l){
+    LInt head, *r = &head, *cl = &l;
+    int i;
+    for (i = 1; *cl; i++) {
+        if (!(i%2)) {
+            *r = *cl;
+            r = &(*r)->prox;
+            *cl = (*cl)->prox;
+        }
+        else 
+            cl = &(*cl)->prox;
+    }
+    *r = NULL;
+    return head;
+}
+
 // Q28
 typedef struct nodo {
     int valor;
     struct nodo *esq, *dir;
 } *ABin;
 
-int altura (ABin a) {
+int altura (ABin a){
     if (!a)
         return 0;
-    return 1 + (altura(a->esq) > altura(a->dir) ? altura(a->esq) : altura(a->dir));
+    int e = altura(a->esq);
+    int d = altura(a->dir);
+    return (e > d ? 1 + e : 1 + d);
 }
 
 // Q29
@@ -1301,10 +1322,10 @@ int freeAB (ABin a) {
     int count = 0;
     
     if (a) {
-        count = freeAB(a->esq) + freeAB(a->dir);
+        count += 1 + freeAB(a->esq) + freeAB(a->dir);
         free(a);
-        count++;
     }
+    
     return count;
 }
 
@@ -1312,31 +1333,29 @@ int freeAB (ABin a) {
 int pruneAB (ABin *a, int l) {
     int count = 0;
 
-    if (!(*a)) 
-        return 0;
-    
-    if (!l) {
-        count++;
-        count += pruneAB(&(*a)->esq, 0) + pruneAB(&(*a)->dir, 0);
+    if (*a && l == 0) {
+        count += 1 + pruneAB(&(*a)->esq, 0) + pruneAB(&(*a)->dir, 0);
         free(*a);
         *a = NULL;
     }
-    else {
-        l--;
-        count += pruneAB(&(*a)->esq, l) + pruneAB(&(*a)->dir, l);
-    }
-
+    else if (*a) 
+        count += pruneAB(&(*a)->esq, l-1) + pruneAB(&(*a)->dir, l-1);
+    
     return count;
+        
 }
 
 // Q37
 int iguaisAB (ABin a, ABin b) {
+    int ret = 1;
+    
     if ((!a && b) || (a && !b))
-        return 0;
-    if (!a && !b)
-        return 1;
-
-    return a->valor == b->valor && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
+        ret = 0;
+    
+    else if (a) 
+        ret = a->valor == b->valor && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
+        
+    return ret;
 }
 
 // Q38
@@ -1427,23 +1446,21 @@ int contaFolhas (ABin a) {
     if (!a)
         return 0;
     
-    if (!(a->esq) && !(a->dir))
-        return 1;
-    
     return (!(a->esq) && !(a->dir)) + contaFolhas(a->esq) + contaFolhas(a->dir);
 }
 
 // Q43
 ABin cloneMirror (ABin a) {
+    ABin new = NULL;
+    
     if (a) {
-        ABin new = malloc(sizeof(struct nodo));
+        new = malloc(sizeof(struct nodo));
         new->valor = a->valor;
         new->esq = cloneMirror(a->dir);
         new->dir = cloneMirror(a->esq);
-        return new;
     }
-
-    return NULL;
+    
+    return new;
 }
 
 // Q44
@@ -1555,7 +1572,7 @@ void listToBTree (LInt l, ABin *a) {
         return ;
     }
 
-    for (; mid; mid--, back = aux, aux = aux->prox);
+    for (; mid > 0; mid--, back = aux, aux = aux->prox);
 
     ABin new = malloc(sizeof(struct nodo));
     new->valor = aux->valor;
