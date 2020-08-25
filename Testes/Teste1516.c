@@ -2,98 +2,74 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <ctype.h>
 
 // PARTE A
 
 // Exercício 1
-
 char *mystrcat (char s1[], char s2[]) {
-    int i, j;
+    int i;
     for (i = 0; s1[i]; i++);
-    for (j = 0; s2[j]; j++, i++) 
-        s1[i] = s2[j];
+    int j;
+    for (j = 0; s2[j]; j++) 
+        s1[i++] = s2[j];
     s1[i] = '\0';
-    return s1;    
+    return s1;
 }
 
 // Exercício 2
-
 int remRep (char x[]) {
     int i, j;
-
     for (i = 0; x[i]; i++) 
         if (x[i] == x[i+1]) {
             for (j = i+1; x[j]; j++)
                 x[j] = x[j+1];
             i--;
         }
-
     return i;
 }
 
 // Exercício 3
-
 typedef struct nodo {
     int valor;
     struct nodo *esq, *dir;
 } *ABin;
 
 int nivelV (ABin a, int n, int v[]) {
-
-    if (!a || n < 1)
+    if (!a || n < 1) 
         return 0;
-
-    else if (n == 1) {
+    if (n == 1) {
         *v = a->valor;
         return 1;
     }
-    else {
-        int e = nivelV(a->esq, n-1, v);
-        int d = nivelV(a->dir, n-1, v+e);
-        return e + d;
-    }
+    int e = nivelV(a->esq, n-1, v);
+    int d = nivelV(a->dir, n-1, v+e);
+    return e+d;
 }
 
 // Exercício 4
-
-int addOrdRec (ABin *a, int x) {
-    ABin new = malloc(sizeof(struct nodo));
-    new->valor = x;
-    new->esq = new->dir = NULL;
-
-    if (!(*a)) {
-        *a = new;
-        return 0;
-    }
-    else if (x < (*a)->valor) 
-        return addOrdRec(&(*a)->esq, x);
-
-    else if (x > (*a)->valor)
-        return addOrdRec(&(*a)->dir, x);
-    
-    else 
-        return 1;   
-}
-
 int addOrd (ABin *a, int x) {
-    while (*a) {
-        if (x < (*a)->valor)
-            a = &(*a)->esq;
-        else if (x > (*a)->valor)
+    int isThere = 0;
+
+    while (*a && !isThere) {
+        int cmp = (*a)->valor - x;
+        if (cmp < 0) 
             a = &(*a)->dir;
+        else if (cmp > 0)
+            a = &(*a)->esq;
         else 
-            return 1;
+            isThere = 1;
     }
-    ABin new = malloc(sizeof(struct nodo));
-    new->valor = x;
-    new->esq = new->dir = NULL; 
-    *a = new;
-    return 0;
+
+    if (!isThere) {
+        *a = malloc(sizeof(struct nodo));
+        (*a)->valor = x;
+        (*a)->esq = (*a)->dir = NULL;
+    }
+
+    return isThere;
 }
 
 // PARTE B
-
 typedef struct listaC {
     int coluna;
     float valor;
@@ -106,130 +82,126 @@ typedef struct listaL {
     struct listaL *prox;
 } *Mat;
 
-// Exercício 1
-
+/* Exercício 1
+Defina a função float getEntry (Mat m, int linha, int coluna) que retorna a entrada solicitada
+na matriz (obs: note que o valor das entradas que não existam em m é implicitamente 0)
+*/
 float getEntry (Mat m, int linha, int coluna) {
-    float ans = 0;
-    Mat aux;
+    float num = 0;
 
-    for (aux = m; aux && aux->linha < linha; aux = aux->prox);
-    if (aux && aux->linha == linha) {
-        Colunas curs;
-        for (curs = aux->lcol; curs && curs->coluna < coluna; curs = curs->prox);
-        if (curs && curs->coluna == coluna)
-            ans = curs->valor;
+    for(; m && m->linha < linha; m = m->prox);
+    if (m && m->linha == linha) {
+        Colunas col = m->lcol;
+        for (; col && col->coluna < coluna; col = col->prox);
+        if (col && col->coluna == coluna)
+            num = col->valor;
     }
 
-    return ans;
+    return num;
 }
 
-// Exercício 2
-
+/* Exercício 2
+Defina a função que insere uma nova entrada na matriz (ou altera o valor dessa entrada, se ela já existir)
+*/
 void setEntry (Mat *m, int linha, int coluna, float valor) {
-
     for (; *m && (*m)->linha < linha; m = &(*m)->prox);
     if (*m && (*m)->linha == linha) {
-        Colunas curs = (*m)->lcol, back = NULL;
-        for (;curs && curs->coluna < coluna; back = curs, curs = curs->prox);
-        if (curs && curs->coluna == coluna) 
-            curs->valor = valor;
+        Colunas* col = &(*m)->lcol;
+        for (; *col && (*col)->coluna < coluna; col = &(*col)->prox);
+        if (*col && (*col)->coluna == coluna)
+            (*col)->valor = valor;
         else {
-            Colunas newC = malloc(sizeof(struct listaC));
-            newC->coluna = coluna;
-            newC->valor = valor;
-            newC->prox = curs;
-            if (back) 
-                back->prox = newC;
-            else 
-                (*m)->lcol = newC;
+            Colunas temp = *col;
+            *col = malloc(sizeof(struct listaC));
+            (*col)->valor = valor;
+            (*col)->coluna = coluna;
+            (*col)->prox = temp;
         }
     }
     else {
-        Mat new = malloc(sizeof(struct listaL));
-        new->linha = linha;
-        new->prox = (*m);
-        new->lcol = malloc(sizeof(struct listaC));
-        new->lcol->coluna = coluna;
-        new->lcol->valor = valor;
-        new->lcol->prox = NULL;
-        *m = new;
+        Mat temp = *m;
+        *m = malloc(sizeof(struct listaL));
+        (*m)->linha = linha;
+        (*m)->lcol = malloc(sizeof(struct listaC));
+        (*m)->lcol->coluna = coluna;
+        (*m)->lcol->valor = valor;
+        (*m)->lcol->prox = NULL;
+        (*m)->prox = temp;
     }
+
 }
 
-// Exercício 3
+/* Exercício 3
+Defina a função que adiciona à matriz *m1 a matriz m2
+*/ 
 
 void addTo (Mat *m1, Mat m2) {
-
-    while (*m1 || m2) {
-        if (*m1 && m2 && (*m1)->linha == m2->linha) {
-            Colunas curs = m2->lcol, colunas_m1 = (*m1)->lcol;
-            while (curs && curs->coluna) {
-                if (curs->coluna == colunas_m1->coluna) {
-                    colunas_m1->valor += curs->valor;
-                    curs = curs->prox;
-                    colunas_m1 = colunas_m1->prox;
-                }
-                else if (curs->coluna < colunas_m1->coluna) {
-                    setEntry(m1, m2->linha, curs->coluna, curs->valor);
-                    curs = curs->prox;
-                }
-                else {
-                    setEntry(m1, m2->linha, curs->coluna, curs->valor);
-                    colunas_m1 = colunas_m1->prox;
-                }
-            }
-            m1 = &(*m1)->prox;
-            m2 = m2->prox;
+    for (; m2; m2 = m2->prox) {
+        Colunas col = m2->lcol;
+        for (; col; col = col->prox) {
+            float x = getEntry(*m1, m2->linha, col->coluna);
+            setEntry(m1, m2->linha, col->coluna, x + col->valor);
         }
-        else if (!(*m1) || (m2 && m2->linha < (*m1)->linha)) {
-            for (Colunas curs = m2->lcol; curs; curs = curs->prox)
-                setEntry(m1, m2->linha, curs->coluna, curs->valor);
-            m2 = m2->prox;
-        }
-
-        else 
-            m1 = &(*m1)->prox;
     }
 }
 
-// Exercício 4
-
+/* Exercício 4
+Defina a função que transpõe a matriz *m
+*/
 void transpose (Mat *m) {
-
+    Mat new = NULL;
+    while (*m) {
+        Colunas* col = &(*m)->lcol;
+        while (*col) {
+            setEntry(&new, (*col)->coluna, (*m)->linha, (*col)->valor);
+            Colunas temp = *col;
+            *col = (*col)->prox;
+            free(temp);
+        }
+        Mat temp = *m;
+        *m = (*m)->prox;
+        free(temp);
+    }
+    *m = new;
 }
 
 // TESTES
 
+void testEntries(Mat m, int linha, int coluna) {
+    printf("A entrada na linha %d e coluna %d é %f\n", linha, coluna, getEntry(m,linha,coluna));
+}
+
 int main() {
-    
-    Mat m = malloc(sizeof(struct listaL));
-    m->linha = 1;
-    m->prox = NULL;
-    m->lcol = malloc(sizeof(struct listaC));
-    m->lcol->valor = 1.3;
-    m->lcol->coluna = 2;
-    m->lcol->prox = NULL;
-
-    printf("Está em m %f\n", getEntry(m, 1, 2));
-    setEntry(&m, 3, 4, 1.70);
-    printf("Inserido em m %f\n", getEntry(m,3,4));
-    setEntry(&m, 1, 1, 1.23);
-    printf("Inserido em m %f\n", getEntry(m,1,1));
-
+    Mat m = NULL;
+    setEntry(&m, 1, 1, 2.03);
+    setEntry(&m, 1, 2, 2.44);
+    setEntry(&m, 4, 1, 2.98);
+    setEntry(&m, 3, 3, 3.44);
+    setEntry(&m, 3, 1, 1.10);
+    setEntry(&m, 3, 2, 0.88);
+    testEntries(m, 1, 1);
+    testEntries(m, 1, 2);
+    testEntries(m, 4, 1);
+    testEntries(m, 3, 3);
+    testEntries(m, 3, 1);
+    testEntries(m, 3, 2);
+    testEntries(m, 1, 7);
     Mat n = NULL;
-    setEntry(&n, 1, 1, 4.33);
-    printf("Inserido em n %f\n", getEntry(n,1,1));
-    setEntry(&n, 1, 2, 1.23);
-    printf("Inserido em n %f\n", getEntry(n,1,2));
-    setEntry(&n, 2, 4, 2.1);
-    printf("Inserido em n %f\n", getEntry(n,2,4));
-    setEntry(&n, 4, 4, 0.11);
-    printf("Inserido em n %f\n", getEntry(n,4,4));
-
+    setEntry(&n, 1, 1, 4.22);
+    setEntry(&n, 1, 2, 3.09);
+    setEntry(&n, 1, 7, 1.19);
     addTo(&m, n);
-    printf("Encontrado em m %f\n", getEntry(m,1,1));
-    printf("Encontrado em m %f\n", getEntry(m,1,2));
-    printf("Encontrado em m %f\n", getEntry(m,2,4));
-    printf("Encontrado em m %f\n", getEntry(m,4,4));
-    return 0;
+    printf("Adição\n");
+    testEntries(m, 1, 1);
+    testEntries(m, 1, 2);
+    testEntries(m, 1, 7);
+    transpose(&m);
+    printf("Transposição\n");
+    testEntries(m, 1, 1);
+    testEntries(m, 2, 1);
+    testEntries(m, 1, 4);
+    testEntries(m, 3, 3);
+    testEntries(m, 1, 3);
+    testEntries(m, 2, 3);
+    testEntries(m, 7, 1);
 }
