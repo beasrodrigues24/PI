@@ -104,6 +104,7 @@ int rankNota (int nota, int fnotas[21]) {
 
 int rankAluno (Alunos a, int numero, int fnotas[21]) {
     int found = 0, rank = 0;
+    
     while (a && !found) {
         int cmp = a->numero - numero;
         if (cmp < 0)
@@ -113,10 +114,9 @@ int rankAluno (Alunos a, int numero, int fnotas[21]) {
         else 
             found = 1;
     }
-    if (found) {
-        int nota = a->nota;
-        rank = rankNota(nota, fnotas);
-    }
+    if (found) 
+        rank = rankNota(a->nota, fnotas);
+    
     return rank;
 }
 
