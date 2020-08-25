@@ -79,7 +79,7 @@ int isEmptyS (STACK *s) {
 int push (STACK *s, int x) {
     int ans = 0;
 
-    if (s->sp == 99)
+    if (s->sp == MAX-1)
         ans = 1;
     else {
         s->sp++;

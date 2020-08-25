@@ -105,22 +105,12 @@ int tail1 (LInt *l) {
 }
 
 int init1 (LInt *l) {
-    int ans = 1;
-    LInt back = NULL;
-
-    if (*l) {
-        ans = 0;
-        for (; (*l)->prox ; back = *l, l = &(*l)->prox); // l = &(*l)->prox não perde o pointer da lista. *l = (*l)->prox sim
-        free(*l);
-        if (back)
-            back->prox = NULL;
-        else {
-            *l = NULL;
-        }
-
-    }
-
-    return ans;
+    if (!(*l))
+        return 1;
+    for (; *l && (*l)->prox; l = &(*l)->prox);
+    free(*l);
+    *l = NULL;
+    return 0;
 }
 
 int snoc1 (LInt *l, int x) {

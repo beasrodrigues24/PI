@@ -65,18 +65,15 @@ int acrescentaAlunoAlfabetica (Turma *t, Aluno a) {
 }
 
 Aluno *procura (Turma t, int numero) {
-    int flag = 1;
     Aluno* ret = NULL; 
-    while (t && flag) {
+    while (t && !ret) {
         int cmp = t->a.numero - numero;
         if (cmp < 0) 
             t = t->dir;
         else if (cmp > 0)
             t = t->esq;
-        else {
-            flag = 0;
+        else 
             ret = &(t->a);
-        }
     }
     return ret;
 }

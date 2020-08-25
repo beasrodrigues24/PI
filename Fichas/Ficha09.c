@@ -114,10 +114,9 @@ typedef struct lista {
 } *LInt;
 
 int length (LInt l) {
-    LInt aux;
     int count;
 
-    for (aux = l, count = 0; aux; aux = aux->prox, count++);
+    for (count = 0; l; l = l->prox, count++);
     return count;
 }
 
@@ -183,9 +182,8 @@ LInt inorderL (ABin a) {
         new->prox = NULL;
         if (aux) 
             aux = aux->prox = new;
-        else {
+        else 
             l = aux = new;
-        }
         
         aux->prox = inorderL(a->dir);
     }
