@@ -155,15 +155,15 @@ memória adicional.
 Se possível, use a informação presente no array freq para optimizar a função.
 */
 
-Alunos procuraAluno(Alunos a, char* nome) {
+Alunos procuraAluno(Alunos a, char* nome, int nota) {
     Alunos ret = NULL;
     
     if (a) {
-        ret = procuraAluno(a->esq, nome);
-        if (!ret && !strcmp(a->nome,nome))
+        ret = procuraAluno(a->esq, nome, nota);
+        if (!ret && !strcmp(a->nome,nome) && a->nota == nota)
             ret = a;
         else if (!ret)
-            ret = procuraAluno(a->dir, nome);
+            ret = procuraAluno(a->dir, nome, nota);
     }
     return ret;
 }
@@ -176,7 +176,7 @@ void preenche (Alunos a, Alunos t[], int freq[21]) {
             StrList sl = NULL;
             comNota(a, i, &sl);
             for (; sl; sl = sl->prox, l++) 
-                t[l] = procuraAluno(a, sl->string);
+                t[l] = procuraAluno(a, sl->string, i);
         }
     }
 }
