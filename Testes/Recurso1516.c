@@ -87,63 +87,37 @@ typedef struct listaP{
 
 // Exercício 1
 int inc(Hist *h, char *pal) {
-    int flag = 0, ret = 1;
+    int ret = 1;
 
-    while (*h && !flag) {
-        int cmp = strcmp((*h)->pal, pal);
-        if (cmp < 0) 
-            h = &(*h)->prox;
-        else if (cmp > 0)
-            break;
-        else {
-            flag = 1;
-            ret = (*h)->cont++;
-        }
-    }
-
-    if (!flag) {
-        Hist temp = NULL;
-        if (*h)
-            temp = *h;
+    for (; *h && strcmp((*h)->pal, pal) < 0; h = &(*h)->prox);
+    
+    if (*h && !strcmp((*h)->pal,pal)) 
+        ret = ++(*h)->cont;
+    else {
+        Hist temp = *h;
         *h = malloc(sizeof(Nodo));
         (*h)->pal = strdup(pal);
-        (*h)->cont = ret;
+        (*h)->cont = 1;
         (*h)->prox = temp;
     }
 
-    return ret;
+    return ret;  
 }
 
 // Exercício 2
 char *remMaisFreq(Hist *h, int *count) {
+    Hist aux = *h;
     *count = 0;
-    Hist curs, back = NULL;
-    char* mfq;
+    for (; aux; aux = aux->prox) 
+        if (aux->cont > *count)
+            *count = aux->cont;
 
-    for (curs = *h; curs; curs = curs->prox)
-        if (curs->cont > *count) {
-            mfq = curs->pal;
-            *count = curs->cont;
-        }
-    
-    curs = *h;
-    while (curs)
-        if (!(strcmp(curs->pal, mfq))) {
-            if (back) {
-                back->prox = curs->prox;
-                back = curs;
-                curs = curs->prox;
-            }
-            else 
-                (*h) = (*h)->prox;
-            free(curs);
-        }
-        else {
-            back = curs;
-            curs = curs->prox;
-        }
-        
-    return mfq;
+    for (; (*h)->cont != *count; h = &(*h)->prox);
+    Hist temp = *h;
+    char* pal = (*h)->pal;
+    *h = (*h)->prox;
+    free(temp);
+    return pal;
 }
 
 // Exercício 3
@@ -160,18 +134,20 @@ void printListaP (Hist h) {
 int main() {
     // PARTE B
 
-    // Exercício 1
+    // Exercício 1 e 2
     Hist h = NULL;
     printf("Inserido 'Teste' com agora %d ocorrências.\n", inc(&h, "Teste"));
+    printf("Inserido 'Programacao' com agora %d ocorrências.\n", inc(&h, "Programacao"));
     printf("Inserido 'De' com agora %d ocorrências.\n", inc(&h, "De"));
     printf("Inserido 'Programacao' com agora %d ocorrências.\n", inc(&h, "Programacao"));
     printf("Inserido 'Imperativa' com agora %d ocorrências.\n", inc(&h, "Imperativa"));
+    printf("Inserido 'Programacao' com agora %d ocorrências.\n", inc(&h, "Programacao"));
     printf("Inserido 'Teste' com agora %d ocorrências.\n", inc(&h, "Teste"));
-    printListaP(h); // OUTPUT CORRETO: ListaP: De (1) -> Imperativa (1) -> Programacao (1) -> Teste (2) -> NULL
+    printListaP(h); // OUTPUT CORRETO: ListaP: De (1) -> Imperativa (1) -> Programacao (3) -> Teste (2) -> NULL
     int num = 0;
     char* mfq = remMaisFreq(&h, &num);
     printf("Removido o elemento %s, com %d ocorrências.\n", mfq, num);
-    printListaP(h);
+    printListaP(h); // OUTPUT CORRETO: ListaP: De (1) -> Imperativa (1) -> Teste (2) -> NULL
 
     return 0;
 }
