@@ -1132,49 +1132,7 @@ LInt rotateL (LInt l){
 }
 
 // Q27
-LInt parte (LInt l) {
-    LInt new, list = NULL, head = NULL, back = NULL;
-    int i;
-
-    if (l) {
-        for (i = 1; l; i++) {
-
-            if (!(i%2)) {
-                // CRIAÇÃO
-                new = malloc(sizeof(struct lligada));
-                new->valor = l->valor;
-                new->prox = NULL;
-                if (!list) 
-                    list = head = new;
-                  
-                else 
-                    list = list->prox = new;
-                   
-                // REMOÇÃO
-                if (!back) {
-                    LInt temp = l;
-                    l = l->prox;
-                    free(temp);
-                    
-                }
-                else {
-                    back->prox = l->prox;
-                    free(l);
-                    l = back->prox;
-                }
-                
-            }
-            else  {
-                back = l;
-                l = l->prox;
-            }
-        }
-    }
-
-    return head;
-}
-
-LInt parteMelhorada (LInt l){
+LInt parte (LInt l){
     LInt head, *i = &head, *p = &l;
     int j;
     for (j = 1; *p; j++) {
@@ -1400,20 +1358,6 @@ ABin somasAcA (ABin a) {
     new->esq = somasAcA(a->esq);
     new->dir = somasAcA(a->dir);
     new->valor = a->valor + (new->esq ? new->esq->valor : 0) + (new->dir ? new->dir->valor : 0);
-    /* Longer dumber way to do the previous line of code
-    int e, d;
-    if (new->esq)
-        e = new->esq->valor;
-    else 
-        e = 0;
-
-    if (new->dir)
-        d = new->dir->valor;
-    else 
-        d = 0;
-    
-    new->valor = a->valor + e + d;
-    */
 
     return new;      
 }
@@ -1541,31 +1485,6 @@ int quantosMaiores (ABin a, int x) {
 
 // Q50
 void listToBTree (LInt l, ABin *a) {
-    int mid = length(l)>>1;
-    LInt aux = l, back = NULL;
-
-    if (!aux) {
-        *a = NULL;
-        return ;
-    }
-
-    for (; mid > 0; mid--, back = aux, aux = aux->prox);
-
-    ABin new = malloc(sizeof(struct nodo));
-    new->valor = aux->valor;
-    new->esq = new->dir = NULL;
-    if (back) {
-        back->prox = NULL;
-    }
-    else 
-        l = NULL;
-    
-    listToBTree(l, &(new->esq));
-    listToBTree(aux->prox, &(new->dir));
-    *a = new;
-}
-
-void listToBTreeMelhorada (LInt l, ABin *a) {
    if (!l) 
         *a = NULL;
     else {
