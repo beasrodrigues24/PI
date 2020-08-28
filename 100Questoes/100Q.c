@@ -1587,17 +1587,6 @@ void listToBTreeMelhorada (LInt l, ABin *a) {
 int compare(ABin a, int num, char c) {
     int ans = 1;
 
-    if (a && c == '<') 
-        ans = a->valor < num && compare(a->esq, num, c) && compare(a->dir, num, c);
-    else if (a && c == '>')
-        ans = a->valor > num && compare(a->esq, num, c) && compare(a->dir, num, c);
-
-    return ans;
-}
-
-int compare(ABin a, int num, char c) {
-    int ans = 1;
-
     if (a) {
         ans = compare(a->esq, num, c) && compare(a->dir, num, c);
         ans = ans && ((c == '<') ? a->valor < num : a->valor > num);
