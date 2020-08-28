@@ -299,7 +299,7 @@ int sufPref (char s1[], char s2[]) {
 
 // Q20
 int contaPal (char s[]) {
-    int inWord = 0, i, j, count = 0;
+    int inWord = 0, i, count = 0;
     
     for (i = 0; s[i]; i++) {
         if (inWord && s[i] == ' ')
@@ -852,7 +852,7 @@ int removeOneOrd (LInt *l, int x){
 
 
 // Q7
-void merge (LInt *r, LInt l1, LInt l2){
+void mergeL (LInt *r, LInt l1, LInt l2){
     for (; l1 || l2; r = &(*r)->prox) {
         if ((l1 && l2 && l1->valor < l2->valor) || !(l2)) {
             *r = l1;
@@ -885,18 +885,11 @@ void splitQS (LInt l, int x, LInt *mx, LInt *Mx){
 // Q9
 LInt parteAmeio (LInt *l){
     int mid = length(*l)>>1;
-    LInt init = *l, back = NULL;
-    for (; mid > 0; mid--, back = *l, *l = (*l)->prox);
-    if (back)
-        if (back) 
-    if (back)
-        back->prox = NULL;
-    else 
-        else 
-    else 
-        init = NULL;
-    
-    return init;
+    LInt head, *r = &head;
+    for (; mid > 0; mid--, *l = (*l)->prox, r = &(*r)->prox)
+        *r = *l;
+    *r = NULL;
+    return head;
 }
 
 // Q10
@@ -992,17 +985,13 @@ LInt cloneL (LInt l) {
     return head;
 }
 
-LInt cloneLSemMalloc (LInt l) {
-    LInt newL = NULL, head = NULL;
-
-    for (; l; l = l->prox) {
-        newL = l;
-        if (!head) 
-            head = l;
-        newL = newL->prox;
+LInt cloneLMelhorada(LInt l) {
+    LInt head, *r = &head;
+    for (; l; l = l->prox, r = &(*r)->prox) {
+        *r = malloc(sizeof(struct lligada));
+        (*r)->valor = l->valor;
     }
-    newL = NULL;
-        
+    *r = NULL;
     return head;
 }
 
@@ -1022,15 +1011,11 @@ LInt cloneRev (LInt l) {
 
 // Q18
 int maximo (LInt l) {
-    LInt aux;
-    int max = -1;
+    int max = l->valor;
     
-    if (l) {
-        max = l->valor;
-        for (aux = l->prox; aux; aux = aux->prox) 
-            if (max < aux->valor)
-            max = aux->valor;
-    }
+    for (; l; l = l->prox)
+        if (l->valor > max)
+            max = l->valor;
 
     return max;
 }
@@ -1042,7 +1027,7 @@ int take (int n, LInt *l){
     while (*l) {
         LInt temp = *l;
         *l = (*l)->prox;
-        free(*l);
+        free(temp);
     }
     return count;
 }
@@ -1095,11 +1080,10 @@ LInt arrayToList (int v[], int N){
 LInt somasAcL (LInt l) {
     LInt head, *r = &head;
     int acum = 0;
-    for (; l; l = l->prox) {
+    for (; l; l = l->prox, r = &(*r)->prox) {
         acum += l->valor;
         *r = malloc(sizeof(struct lligada));
         (*r)->valor = acum;
-        r = &(*r)->prox;
     }
     *r = NULL;
     return head;
@@ -1122,17 +1106,12 @@ void remreps (LInt l) {
 }
 
 void remrepsAlt (LInt l){
-    
     for (; l; l = l->prox) {
-        LInt *r = &(l->prox);
-        while (*r) {
-            if ((*r)->valor == l->valor) {
-                LInt temp = *r;
-                *r = (*r)->prox;
-                free(temp);
-            }
-            else 
-                r = &(*r)->prox;
+        LInt *c = &(l->prox);
+        while (*c && (*c)->valor == l->valor) {
+            LInt temp = *c;
+            *c = (*c)->prox;
+            free(temp);
         }
     }
 }
@@ -1196,18 +1175,18 @@ LInt parte (LInt l) {
 }
 
 LInt parteMelhorada (LInt l){
-    LInt head, *r = &head, *cl = &l;
-    int i;
-    for (i = 1; *cl; i++) {
-        if (!(i%2)) {
-            *r = *cl;
-            r = &(*r)->prox;
-            *cl = (*cl)->prox;
+    LInt head, *i = &head, *p = &l;
+    int j;
+    for (j = 1; *p; j++) {
+        if (!(j%2)) {
+            *i = *p;
+            i = &(*i)->prox;
+            *p = (*p)->prox;
         }
         else 
-            cl = &(*cl)->prox;
+            p = &(*p)->prox;
     }
-    *r = NULL;
+    *i = NULL;
     return head;
 }
 
@@ -1251,7 +1230,6 @@ void mirror (ABin *a) {
 
 // Q31
 void inorder (ABin a, LInt *l) {
-    *l = NULL;
     if (a) {
         inorder(a->esq, l);
         while (*l)
@@ -1261,11 +1239,12 @@ void inorder (ABin a, LInt *l) {
         (*l)->prox = NULL;
         inorder(a->dir,&(*l)->prox);
     }
+    else 
+        *l = NULL;
 }
 
 // Q32
 void preorder (ABin a, LInt *l) {
-    *l = NULL;
     if (a) {
         *l = malloc(sizeof(struct nodo));
         (*l)->valor = a->valor;
@@ -1275,11 +1254,12 @@ void preorder (ABin a, LInt *l) {
             l = &(*l)->prox;
         preorder(a->dir, l);
     }
+    else
+        *l = NULL;
 }
 
 // Q33
 void posorder (ABin a, LInt *l) {
-    *l = NULL;
     if (a) {
         posorder(a->esq, l);
         while (*l)
@@ -1291,9 +1271,11 @@ void posorder (ABin a, LInt *l) {
         (*l)->valor = a->valor;
         (*l)->prox = NULL;
     }
+    else 
+        *l = NULL;
 }
 
-// Q34 -- stolen
+// Q34
 int depth (ABin a, int x) {
 
     if (!a) 
@@ -1304,17 +1286,12 @@ int depth (ABin a, int x) {
     
     int esq = depth(a->esq, x);
     int dir = depth(a->dir, x);
-
     if (esq == -1 && dir == -1)
         return -1;
-    
-    if (esq == -1) 
+    if (esq == -1 || (esq != -1 && dir != -1 && dir < esq)) 
         return 1 + dir;
-    
-    if (dir == -1)
-        return 1 + esq;
+    return 1 + esq;
 
-    return esq < dir ? 1 + esq : 1 + dir;
 }
 
 // Q35
@@ -1577,21 +1554,68 @@ void listToBTree (LInt l, ABin *a) {
     ABin new = malloc(sizeof(struct nodo));
     new->valor = aux->valor;
     new->esq = new->dir = NULL;
-
     if (back) {
         back->prox = NULL;
     }
     else 
         l = NULL;
     
-
     listToBTree(l, &(new->esq));
     listToBTree(aux->prox, &(new->dir));
     *a = new;
 }
 
+void listToBTreeMelhorada (LInt l, ABin *a) {
+   if (!l) 
+        *a = NULL;
+    else {
+        int mid = length(l)>>1;
+        LInt *c = &l;
+        for (; mid > 0; mid--, c = &(*c)->prox);
+        *a = malloc(sizeof(struct nodo));
+        (*a)->valor = (*c)->valor;
+        (*a)->esq = (*a)->dir = NULL;
+        LInt next = (*c)->prox;
+        *c = NULL;
+        listToBTree(l, &(*a)->esq);
+        listToBTree(next, &((*a)->dir));
+    }
+}
+
 // Q51
 
+int compare(ABin a, int num, char c) {
+    int ans = 1;
+
+    if (a && c == '<') 
+        ans = a->valor < num && compare(a->esq, num, c) && compare(a->dir, num, c);
+    else if (a && c == '>')
+        ans = a->valor > num && compare(a->esq, num, c) && compare(a->dir, num, c);
+
+    return ans;
+}
+
+int compare(ABin a, int num, char c) {
+    int ans = 1;
+
+    if (a) {
+        ans = compare(a->esq, num, c) && compare(a->dir, num, c);
+        ans = ans && ((c == '<') ? a->valor < num : a->valor > num);
+    }
+    return ans;
+}
+
+int deProcura (ABin a) {
+    int ans = 1;
+
+    if (a && (!(compare(a->esq, a->valor, '<') && compare(a->dir, a->valor, '>'))))
+        ans = 0;
+    else if (a)
+        ans = deProcura(a->esq) && deProcura(a->dir);
+
+    return ans;
+}
+    
 // Testes
 
 void printTree(ABin a) {
