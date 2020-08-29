@@ -236,9 +236,9 @@ int iguaisConsecutivos (char s[]) {
 // Q16 -- stolen
 int not_in_prev(char str[], int k, int n) {
     int ans = 1, i;
-    for(i = k; i < n; i++) {
+    for(i = k; i < n && ans; i++) {
         if(str[i] == str[n]) {
-            return 0;
+            ans 0;
         }
     }
     return ans;
@@ -602,14 +602,14 @@ int triSup (int N, float m [N][N]) {
 
 // Q40
 void transposta (int N, float m [N][N]) {
-    int i, j, temp;
+    int i, j;
+    float temp;
 
     for (i = 0; i < N; i++) {
         for (j = 0; j < i; j++) {
             temp = m [i][j];
             m [i][j] = m [j][i];
-            m [j][i] = temp;
-            
+            m [j][i] = temp;  
         }
     }
 }

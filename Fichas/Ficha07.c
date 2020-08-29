@@ -169,18 +169,6 @@ int acrescentaAluno (Turma *t, Aluno a) {
     return 0;
 }
 
-Aluno *procura1 (Turma t, int numero) {
-    Aluno *ret = NULL;
-
-    if (t) {
-        for (; t && !ret; t = t->prox)
-            if (t->aluno.numero == numero)
-                ret = &(t->aluno);
-    }
-
-    return ret;
-}
-
 Aluno *procura (Turma t, int numero) {
     Aluno *ret = NULL;
 
