@@ -521,52 +521,45 @@ int elimRepOrd (int v[], int n) {
     return i;   
 }
 
-// Q35 -- stolen
+// Q35
 int comunsOrd (int a[], int na, int b[], int nb) {
-    int i = 0, j = 0, ans = 0;
+    int i = 0, j = 0, count = 0;
     while(i < na && j < nb) {
-        if(a[i++] == b[j++]) {
-            ans++;
+        if(a[i] == b[j]) {
+            count++;
             i++;
             j++;
         }
         else if(a[i] > b[j]) j++;
         else i++;
     }
-    return ans;
+    return count;
 }
-
 
 // Q36
 int comuns (int a[], int na, int b[], int nb) {
     int i, j, counter = 0, flag = 1;
 
-    for (i = 0; i < na; i++) {
+    for (i = 0; i < na; i++, flag = 1) 
         for (j = 0; j < nb && flag; j++) 
             if (a[i] == b[j]) {
                 counter++;
                 flag = 0;
             }
-        flag = 1;
-    }
+    
     return counter;
 }
 
 // Q37
 int minInd (int v[], int n) {
-   int r = -1, i, min;
-   
-   for (i = 0; i < n; i++) {
-       if (!i) {
-           r = 0;
-           min = v[0];
-       }
-       else if (v[i] < min) {
-           min = v[i];
-           r = i;
-       }
-   }
-   return r;
+    int r = -1, min, i;
+    
+    for (i = 0; i < n; i++)
+        if (!i || v[i] < min) {
+            min = v[i];
+            r = i;
+        }
+    return r;
 }
 
 // Q38
