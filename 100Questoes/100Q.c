@@ -237,9 +237,8 @@ int iguaisConsecutivos (char s[]) {
 int not_in_prev(char str[], int k, int n) {
     int ans = 1, i;
     for(i = k; i < n && ans; i++) {
-        if(str[i] == str[n]) {
-            ans 0;
-        }
+        if(str[i] == str[n])
+            ans = 0;
     }
     return ans;
 }
@@ -1194,7 +1193,6 @@ void inorder (ABin a, LInt *l) {
             l = &(*l)->prox;
         *l = malloc(sizeof(struct nodo));
         (*l)->valor = a->valor;
-        (*l)->prox = NULL;
         inorder(a->dir,&(*l)->prox);
     }
     else 
@@ -1206,7 +1204,6 @@ void preorder (ABin a, LInt *l) {
     if (a) {
         *l = malloc(sizeof(struct nodo));
         (*l)->valor = a->valor;
-        (*l)->prox = NULL;
         preorder(a->esq,&(*l)->prox);
         while (*l)
             l = &(*l)->prox;
@@ -1287,7 +1284,7 @@ int iguaisAB (ABin a, ABin b) {
     if ((!a && b) || (a && !b))
         ret = 0;
     
-    else if (a) 
+    else if (a && b) 
         ret = a->valor == b->valor && iguaisAB(a->esq, b->esq) && iguaisAB(a->dir, b->dir);
         
     return ret;
@@ -1503,6 +1500,7 @@ void listToBTree (LInt l, ABin *a) {
 
 // Q51
 
+// Versão kinda stupid
 int compare(ABin a, int num, char c) {
     int ans = 1;
 
@@ -1522,6 +1520,24 @@ int deProcura (ABin a) {
         ans = deProcura(a->esq) && deProcura(a->dir);
 
     return ans;
+}
+
+// Versão com mais sentido
+int maior(ABin a, int x) {
+    return (!a || (a && a->valor > x && maior(a->esq, x) && maior(a->dir, x)));
+} 
+
+int menor(ABin a, int x) {
+    return (!a || (a && a->valor < x && menor(a->esq, x) && menor(a->dir, x)));
+}
+
+int deProcura1 (ABin a) {
+    if (a) {
+        int ans = menor(a->esq, a->valor) && maior(a->dir, a->valor);
+        return ans && deProcura(a->esq) && deProcura(a->dir);
+    }
+    
+    return 1;
 }
     
 // Testes
