@@ -142,22 +142,21 @@ int acrescentaElem (ABin *a, int x) {
     return !flag;
 }
 
-ABin fromList (LInt l);
 ABin fromListAux (LInt l, int cmp) {
-    LInt aux = l, init = l;
+    LInt init = l;
     ABin new = NULL;
     int mid = cmp>>1;
 
-    if (aux && mid >= 0) { // Não sei porquê que isto resulta
+    if (l && mid >= 0) { // Não sei porquê que isto resulta
         int num;
         if (mid > 1)
-            for (num = mid; num > 0; num--, aux = aux->prox);
+            for (num = mid; num > 0; num--, l = l->prox);
         else 
             init = NULL;
         
-        acrescentaElem(&new, aux->valor);
+        acrescentaElem(&new, l->valor);
         new->esq = fromListAux(init, mid);
-        new->dir = fromListAux(aux->prox, cmp - 1 - mid);
+        new->dir = fromListAux(l->prox, cmp - 1 - mid);
         
     }
     return new;
@@ -168,27 +167,17 @@ ABin fromList (LInt l) {
 }
 
 LInt inorderL (ABin a) {
-    LInt l = NULL, aux;
-
+    LInt head = NULL;
     if (a) {
-        l = inorderL(a->esq);
-        aux = l;
-
-        while (aux && aux->prox)
-            aux = aux->prox;
-        
-        LInt new = malloc(sizeof(struct lista));
-        new->valor = a->valor;
-        new->prox = NULL;
-        if (aux) 
-            aux = aux->prox = new;
-        else 
-            l = aux = new;
-        
-        aux->prox = inorderL(a->dir);
+        LInt *r = &head;
+        *r = inorderL (a->esq);
+        while (*r)
+            r = &(*r)->prox;
+        *r = malloc(sizeof(struct lista));
+        (*r)->valor = a->valor;
+        (*r)->prox = inorderL(a->dir);
     }
-
-    return l;
+    return head;
 }
 
 // Exercício 3
@@ -199,28 +188,18 @@ typedef struct dlista {
 } *DLInt;
 
 DLInt inorderDL (ABin a) {
-    DLInt new = NULL, begin = NULL, cursor = NULL;
-
+    DLInt head = NULL;
     if (a) {
-        begin = inorderDL(a->esq);
-        new = malloc(sizeof(struct dlista));
-        new->valor = a->valor;
-        
-        if (!begin) {
-            begin = new;
-            begin->ant = NULL;
-        }
-        else {
-            cursor = begin;
-            while (cursor && cursor->prox) 
-                cursor = cursor->prox;
-            cursor->prox = new;
-        }
-        new->prox = inorderDL(a->dir);
-            
+        DLInt *r = &head;
+        *r = inorderDL(a->esq);
+        DLInt back = NULL;
+        for (; *r; back = *r, r = &(*r)->prox);
+        *r = malloc(sizeof(struct dlista));
+        (*r)->ant = back;
+        (*r)->valor = a->valor;
+        (*r)->prox = inorderDL(a->dir);
     }
-
-    return begin;
+    return head;
 }
 
 // TESTES

@@ -120,7 +120,7 @@ int acrescentaNoInicio (Dicionario *d, char *pal) {
 
 char *maisFreq (Dicionario d, int *c) {
 
-    char* mfq = "error";
+    char* mfq = NULL;
     *c = 0;
 
     for (; d; d = d->prox) {

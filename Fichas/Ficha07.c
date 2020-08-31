@@ -321,36 +321,23 @@ void concatDL (DLInt *a, DLInt b) {
 
 LInt toLInt (DLInt l) {
     inicio(&l);
-    LInt list = NULL, head = NULL;
-
-    for (; l; l = l->prox) {
-        LInt temp = malloc(sizeof(struct slist));
-        temp->valor = l->valor;
-        temp->prox = NULL;
-        if (!head) 
-            head = list = temp;
-        else 
-            list = list->prox = temp;
+    LInt head, *r = &head;
+    for (; l; l = l->prox, r = &(*r)->prox) {
+        *r = malloc(sizeof(struct slist));
+        (*r)->valor = l->valor;
     }
-
+    *r = NULL;
     return head;
 }
 
 DLInt fromLInt (LInt l) {
-    DLInt list = NULL, head = NULL, back = NULL;
-
-    for (; l; l = l->prox) {
-        DLInt new = malloc(sizeof(struct dlist));
-        new->ant = back;
-        new->valor = l->valor;
-        new->prox = NULL;
-        if (!head) 
-            back = list = head = new;
-        
-        else 
-            back = list = list->prox = new;
+    DLInt head, *r = &head, back = NULL;
+    for (; l; l = l->prox, back = *r, r = &(*r)->prox) {
+        *r = malloc(sizeof(struct dlist));
+        (*r)->valor = l->valor;
+        (*r)->ant = back;
     }
-
+    *r = NULL;
     return head;
 }
 
