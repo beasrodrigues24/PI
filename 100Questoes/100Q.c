@@ -681,14 +681,14 @@ Posicao posFinal (Posicao inicial, Movimento mov[], int N) {
 }
 
 // Q48
-int caminho (Posicao inicial, Posicao final, Movimento mov[], int N) {
-    int i;
+int iguais(Posicao p1, Posicao p2) {
+    return p1.y == p2.y && p1.x == p2.x;
+}
+
+int caminho (Posicao inicial, Posicao final, Movimento mov[], int N){
+    int i, r = -1;
     
-    for (i=0; i<=N; i++) {
-        
-        if ((inicial.x == final.x) && (inicial.y == final.y)) 
-            return i;
-        
+    for (i = 0; i < N && !iguais(inicial,final); i++) {
         if (inicial.y > final.y) {
             mov[i] = Sul;
             inicial.y--;
@@ -706,8 +706,10 @@ int caminho (Posicao inicial, Posicao final, Movimento mov[], int N) {
             inicial.x++;
         }
     }
-    
-    return -1;
+    if (iguais(inicial,final))
+        r = i;
+        
+    return r;
 }
 
 // Q49
@@ -726,10 +728,6 @@ int maiscentral (Posicao pos[], int N) {
 }
 
 // Q50
-int iguais(Posicao p1, Posicao p2) {
-    return p1.y == p2.y && p1.x == p2.x;
-}
-
 int vizinhos (Posicao p, Posicao pos[], int N) {
     int i, contador = 0;
 
