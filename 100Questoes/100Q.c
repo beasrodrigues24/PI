@@ -609,66 +609,43 @@ void addTo (int N, int M, int a [N][M], int b[N][M]) {
 
 // Q42
 int unionSet (int N, int v1[N], int v2[N], int r[N]){
-    int contador = 0, i;
-
-    for (i = 0; i < N; i++) 
-        if (v1[i] || v2[i]) {
-            contador++;
-            r[i] = 1;
-        }
-
-    return contador;
+    int i;
+    for (i = 0; i < N; i++)
+        r[i] = v1[i] || v2[i];
+    return i;
 }
 
 // Q43
 int intersectSet (int N, int v1[N], int v2[N], int r[N]){
-    int contador = 0, i;
-
-    for (i = 0; i < N; i++) 
-        if (v1[i] && v2[i]) {
-            contador++;
-            r[i] = 1;
-        }
-
-    return contador;
+    int i;
+    for (i = 0; i < N; i++)
+        r[i] = v1[i] && v2[i];
+    return i;
 }
 
 // Q44
 int intersectMSet (int N, int v1[N], int v2[N], int r[N]){
     int i;
-    
-    for (i = 0; i < N; i++) {
-        
-        if (v1[i] && v2[i]) {
-            if (v1[i] > v2[i])
-                r[i] = v2[i];
-            else 
-                r[i] = v1[i];
-        }
-    }
-    
+    for (i = 0; i < N; i++)
+        r[i] = v1[i] < v2[i] ? v1[i] : v2[i];
     return i;
 }
 
 // Q45
-int unionMSet (int N, int v1[N], int v2[N], int r[N]) {
+int unionMSet (int N, int v1[N], int v2[N], int r[N]){
     int i;
-    for (i = 0; i < N; i++) {
-        if (v1[i]>v2[i]) 
-            r[i] = v1[i]; 
-        else r[i] = v2[i];
-    }
-    return i; 
+    for (i = 0; i < N; i++)
+        r[i] = v1[i] > v2[i] ? v1[i] : v2[i];
+    return i;
 }
 
 // Q46
 int cardinalMSet (int N, int v[N]) {
     int i, res = 0;
 
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++) 
         res += v[i];
-    }
-
+    
     return res;
 }
 
@@ -684,7 +661,7 @@ typedef struct posicao {
 Posicao posFinal (Posicao inicial, Movimento mov[], int N) {
     int i;
     
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++) 
         switch (mov[i]) {
             case Norte: 
                 inicial.y++;
@@ -699,7 +676,7 @@ Posicao posFinal (Posicao inicial, Movimento mov[], int N) {
                 inicial.y--;
                 break;
         }
-    }
+    
     return inicial;
 }
 
@@ -735,26 +712,29 @@ int caminho (Posicao inicial, Posicao final, Movimento mov[], int N) {
 
 // Q49
 int maiscentral (Posicao pos[], int N) {
-    int central = 0, i;
-    int dist = pos[0].x*pos[0].x + pos[0].y*pos[0].y, curr;
-
-    for (i = 0; i < N; i++) {
-        curr = pos[i].x*pos[i].x + pos[i].y*pos[i].y;
-        if (dist > curr) {
-            dist = curr;
-            central = i;
+    int min, dist, r = 0, i;
+    min = pow(pos[0].x, 2) + pow(pos[0].y, 2);
+    
+    for (i = 1; i < N; i++) {
+        dist = pow(pos[i].x, 2) + pow(pos[i].y, 2);
+        if (dist < min) {
+            min = dist;
+            r = i;
         }
     }
-    return central;
+    return r;
 }
 
 // Q50
+int iguais(Posicao p1, Posicao p2) {
+    return p1.y == p2.y && p1.x == p2.x;
+}
+
 int vizinhos (Posicao p, Posicao pos[], int N) {
     int i, contador = 0;
 
     for (i = 0; i < N; i++) {
-        if (p.y == pos[i].y && p.x == pos[i].x) {;}
-        else if (sqrt((p.x - pos[i].x)*(p.x - pos[i].x) + (p.y - pos[i].y)*(p.y - pos[i].y)) <= 1)
+        if (pow(p.x - pos[i].x, 2) + pow(p.y - pos[i].y, 2) < 2 && !iguais(p, pos[i]))
             contador++;
     }
     return contador;
