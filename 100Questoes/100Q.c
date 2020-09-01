@@ -324,20 +324,6 @@ int contaVogais (char s[]) {
 
 // Q22
 int contida (char a[], char b[]) {
-    int i, j, ans = 1, isThere = 0;
-
-    for (i = 0; a[i] && ans; i++, isThere = 0) {
-        for (j = 0; b[j]; j++) 
-            if (a[i] == b[j])
-                isThere = 1;
-        if (!isThere)
-            ans = 0;
-    }
-
-    return ans;
-}
-
-int contida2 (char a[], char b[]) {
     int i, j, ans = 1;
     
     for (i = 0; a[i] && ans; i++) {
@@ -931,24 +917,7 @@ void concatL (LInt *a, LInt b){
 }
 
 // Q16
-LInt cloneL (LInt l) {
-    LInt new = NULL, head = NULL;;
-    if (l) {
-        for (; l; l = l->prox) {
-            new = malloc(sizeof(struct lligada));
-            new->valor = l->valor;
-            new->prox = NULL;
-            if (!head)
-                head = new;
-            new = new->prox;
-        }
-        new->prox = NULL;
-    }
-
-    return head;
-}
-
-LInt cloneLMelhorada(LInt l) {
+LInt cloneL(LInt l) {
     LInt head, *r = &head;
     for (; l; l = l->prox, r = &(*r)->prox) {
         *r = malloc(sizeof(struct lligada));
@@ -1053,22 +1022,7 @@ LInt somasAcL (LInt l) {
 }
 
 // Q25
-void remreps (LInt l) {
-    LInt back = NULL;
-
-    while (l) {
-        LInt curs, front;
-        back = l;
-        for (curs = l->prox; curs && curs->valor == l->valor; curs = front) {
-            front = curs->prox;
-            back->prox = curs->prox;
-            free(curs);
-        }
-        l = l->prox;
-    }
-}
-
-void remrepsAlt (LInt l){
+void remreps (LInt l){
     for (; l; l = l->prox) {
         LInt *c = &(l->prox);
         while (*c && (*c)->valor == l->valor) {
