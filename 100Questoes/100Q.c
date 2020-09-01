@@ -72,26 +72,20 @@ int bitsUm (unsigned int n) {
 int trailingZ (unsigned int n) {
     if (n == 0)
         return 32;
-    int count = 0;
     
-    while (n > 0) {
-        if (n%2 == 0)
-            count++;
-        n >>= 1;
-    }
+    int count = 0;
+    for (; n > 0; n >>=1) 
+        count += !(n%2);
+    
     return count;
 }
 
-
 // Q6
-int qDig (unsigned int n) {
-    int count = 0;
+int qDig (int n) {
+    int count;
     
-    while (n) {
-        count++;
-        n /= 10;
-    }
-
+    for (count = 0; n > 0; count++, n /= 10);
+    
     return count;
 }
 
@@ -127,15 +121,13 @@ int mystrcmp(char s1[], char s2[]) {
 
 // Q10
 char *mystrstr (char s1[], char s2[]) {
-    int i, j, flag = 1, l;
+    int i, j, l;
     char* end = NULL;
-    for (i = 0, j = 0; s1[i] && flag; i++, j=0) {
+    for (i = 0, j = 0; s1[i] && !end; i++, j=0) {
         if (s1[i] == s2[j]) {
-            for (l=i; s1[l] == s2[j] && s2[j]; j++,l++);
-            if (s2[j] == '\0') {
-                flag = 0;
+            for (l = i; s1[l] == s2[j] && s2[j]; j++,l++);
+            if (!s2[j]) 
                 end = s1 + i;
-            }
         }
     }
     if (!(*s2)) 
@@ -202,14 +194,12 @@ void truncW (char t[], int n) {
 
 // Q14
 char charMaisfreq (char s[]) {
-    int freq = 0, i, j, count = 0;
+    int freq = 0, i, j, count = 1;
     char cmf = '\0';
 
-    for (i = 0; s[i]; i++, count = 0) {
-        for (j = i; s[j]; j++) {
-            if (s[i] == s[j])
-                count++; 
-        }
+    for (i = 0; s[i]; i++, count = 1) {
+        for (j = i+1; s[j]; j++) 
+            count += s[i] == s[j];
 
         if (count > freq) {
             cmf = s[i];
@@ -224,38 +214,35 @@ char charMaisfreq (char s[]) {
 int iguaisConsecutivos (char s[]) {
     int i, j, streak = 1, max = 0;
     
-    for (i = 0; s[i]; i = ++j) {
-        for (j = i; s[j] && s[j] == s[j+1]; j++, streak++);
+    for (i = 0; s[i]; i = ++j, streak = 1) {
+        for (j = i; s[j] == s[j+1]; j++, streak++);
         if (streak > max)
             max = streak;
-        streak = 1;
     }
     return max;
 }
 
 // Q16 -- stolen
-int not_in_prev(char str[], int k, int n) {
-    int ans = 1, i;
-    for(i = k; i < n && ans; i++) {
-        if(str[i] == str[n])
-            ans = 0;
-    }
+int ocorreu(char s[], int j, int n) {
+    int i, ans = 0;
+    for (i = j; i < n && !ans; i++)
+        ans = s[i] == s[n];
     return ans;
 }
 
 int difConsecutivos(char s[]) {
-    int ans = 0, i, j, flag = 1;
-    for(i = 0; s[i]; i++, flag = 1) {
-        int consec = 0;
-        for(j = i; s[j] && flag; j++) {
-            if(not_in_prev(s,i,j)) 
-                consec++;
+    int i, j,count = 0, max = 0, flag = 1;
+    for (i = 0; s[i]; i++, count = 0, flag = 1) {
+        for (j = i; s[j] && flag; j++) {
+            if (!ocorreu(s, i, j))
+                count++;
             else 
-                flag = 0;;
+                flag = 0;
         }
-        if (consec > ans) ans = consec;
+        if (count > max)
+            max = count;
     }
-    return ans;
+    return max;
 }
 
 // Q17
@@ -284,7 +271,7 @@ int maiorSufixo (char s1 [], char s2 []) {
 int sufPref (char s1[], char s2[]) {
     int i, count, j;
 
-    for (i = 0, j = 0; s1[i]; i++) {
+    for (i = j = 0; s1[i]; i++) {
         if (s1[i] == s2[j]) {
             j++;
             count++;
@@ -343,8 +330,7 @@ int palindroma (char s[]) {
     i--;
     
     for (j = 0; j < i && ans; j++, i--)
-        if (s[j] != s[i])
-            ans = 0;
+        ans = s[j] == s[i];
             
     return ans;
 }
@@ -391,26 +377,18 @@ void merge (int r [], int a[], int b[], int na, int nb){
     int i, ca, cb;
     
     for (i = ca = cb = 0; i < na + nb; i++) {
-        if ((ca < na && cb < nb && b[cb] < a[ca]) || ca >= na) {
-            r[i] = b[cb];
-            cb++;
-        }
-        else {
-            r[i] = a[ca];
-            ca++;
-        }
+        if ((ca < na && cb < nb && b[cb] < a[ca]) || ca >= na) 
+            r[i] = b[cb++];
+        else 
+            r[i] = a[ca++];
     }
 }
 
 // Q28
-int crescente (int a[], int i, int j) {
+int crescente (int a[], int i, int j){
     int ans = 1;
-    
-    for (; i < j && ans; i++) {
-        if (a[i] > a[i+1])
-            ans = 0;
-    }
-
+    for (; i < j && ans; i++)
+        ans = a[i] <= a[i+1];
     return ans;
 }
 
@@ -434,13 +412,12 @@ int retiraNeg (int v[], int N) {
 int menosFreq (int v[], int N){
     int i, j, count = 1, min = N, mf = v[0];
     
-    for (i = 0; i < N; i = j) {
+    for (i = 0; i < N; i = j, count = 1) {
         for (j = i+1; j < N && v[i] == v[j]; j++, count++);
         if (count < min) {
             min = count;
             mf = v[i];
         }
-        count = 1;
     }
     return mf;
 }
@@ -449,13 +426,12 @@ int menosFreq (int v[], int N){
 int maisFreq (int v[], int N){
     int i, j, max = 0, count = 1, mf = v[0];
     
-    for (i = 0; i < N; i = j) {
+    for (i = 0; i < N; i = j, count = 1) {
         for (j = i+1; j < N && v[j] == v[i]; j++, count++);
         if (count > max) {
             max = count;
             mf = v[i];
         }
-        count = 1;
     }
 
     return mf;
@@ -466,11 +442,10 @@ int maisFreq (int v[], int N){
 int maxCresc (int v[], int N) {
     int i, j, count = 1, max = 0;
     
-    for (i = 0; i < N; i++) {
+    for (i = 0; i < N; i++, count = 1) {
         for (j = i+1; j < N && v[j] >= v[j-1]; j++, count++);
         if (count > max) 
             max = count;
-        count = 1;
     }
     return max;
 }
@@ -523,17 +498,14 @@ int comunsOrd (int a[], int na, int b[], int nb) {
 }
 
 // Q36
-int comuns (int a[], int na, int b[], int nb) {
-    int i, j, counter = 0, flag = 1;
-
-    for (i = 0; i < na; i++, flag = 1) 
-        for (j = 0; j < nb && flag; j++) 
-            if (a[i] == b[j]) {
-                counter++;
-                flag = 0;
-            }
-    
-    return counter;
+int comuns (int a[], int na, int b[], int nb){
+    int i, j, count = 0;
+    for (i = 0; i < na; i++) {
+        for (j = 0; j < nb && b[j] != a[i]; j++);
+        if (j < nb)
+            count++;
+    }
+    return count;
 }
 
 // Q37
@@ -574,11 +546,10 @@ int triSup (int N, float m [N][N]) {
 // Q40
 void transposta (int N, float m [N][N]) {
     int i, j;
-    float temp;
 
     for (i = 0; i < N; i++) {
         for (j = 0; j < i; j++) {
-            temp = m [i][j];
+            float temp = m [i][j];
             m [i][j] = m [j][i];
             m [j][i] = temp;  
         }
@@ -980,7 +951,7 @@ int drop (int n, LInt *l) {
 // Q21
 LInt Nforward (LInt l, int N) {
 
-    for (; N;  l = l->prox, N--);
+    for (; N > 0;  l = l->prox, N--);
        
     return l;
 }
@@ -1050,18 +1021,19 @@ LInt rotateL (LInt l){
 
 // Q27
 LInt parte (LInt l){
-    LInt head, *i = &head, *p = &l;
+    LInt head, *p = &head, *i = &l;
     int j;
-    for (j = 1; *p; j++) {
+    for (j = 1; *i; j++) {
         if (!(j%2)) {
-            *i = *p;
-            i = &(*i)->prox;
-            *p = (*p)->prox;
+            *p = *i;
+            *i = (*i)->prox;
+            p = &(*p)->prox;
+           
         }
         else 
-            p = &(*p)->prox;
+            i = &(*i)->prox;
     }
-    *i = NULL;
+    *p = NULL;
     return head;
 }
 
@@ -1209,15 +1181,11 @@ int iguaisAB (ABin a, ABin b) {
 }
 
 // Q38
-LInt concat(LInt a, LInt b) {
-    if(!a) 
-        return b;
-    LInt temp = a;
-    while(temp->prox) 
-        temp = temp->prox;
-    temp->prox = b;
-    
-    return a;
+LInt concat(LInt *a, LInt b) {
+    LInt init = (*a ? *a : b);
+    for (; *a; a = &(*a)->prox);
+    *a = b;
+    return init;
 }
 
 LInt nivelL (ABin a, int n) {
@@ -1229,8 +1197,9 @@ LInt nivelL (ABin a, int n) {
         new->valor = a->valor;
         new->prox = NULL;
         return new;
-    }else 
-        return concat(nivelL(a->esq, n-1), nivelL(a->dir, n-1));
+    }
+    LInt listE = nivelL(a->esq, n-1);
+    return concat(&listE, nivelL(a->dir, n-1));
 }
 
 // Q39
