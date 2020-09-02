@@ -121,19 +121,17 @@ int mystrcmp(char s1[], char s2[]) {
 
 // Q10
 char *mystrstr (char s1[], char s2[]) {
+    char *ret = NULL;
     int i, j, l;
-    char* end = NULL;
-    for (i = 0, j = 0; s1[i] && !end; i++, j=0) {
-        if (s1[i] == s2[j]) {
-            for (l = i; s1[l] == s2[j] && s2[j]; j++,l++);
-            if (!s2[j]) 
-                end = s1 + i;
-        }
+    for (i = 0; s1[i] && !ret; i++) {
+        for (j = 0, l = i; s1[l] == s2[j] && s2[j]; l++, j++);
+        if (!s2[j])
+            ret = s1 + i;
     }
-    if (!(*s2)) 
-        end = s1;
-
-    return end;
+    if (!(*s2))
+        ret = s1;
+    
+    return ret;
 }
 
 // Q11
@@ -177,9 +175,8 @@ void truncW (char t[], int n) {
     int i, count = 0, j;
 
     for (i = 0; t[i]; i++) {
-        if (t[i] != ' ') {
+        if (t[i] != ' ') 
             count++;
-        }
         else 
             count = 0;
 
@@ -249,11 +246,10 @@ int difConsecutivos(char s[]) {
 int maiorPrefixo (char s1 [], char s2 []) {
     int i;
     
-    for (i = 0; s1[i] == s2[i]; i++);
+    for (i = 0; s1[i] && s2[i] && s1[i] == s2[i]; i++);
     
     return i;
 }
-
 // Q18
 int maiorSufixo (char s1 [], char s2 []) {
     int l1, l2, count=0;
@@ -262,7 +258,7 @@ int maiorSufixo (char s1 [], char s2 []) {
     for (l2 = 0; s2[l2]; l2++);
     l1--; l2--;
     
-    for (; s1[l1] == s2[l2]; l1--, l2--, count++);
+    for (; l1 > -1 && l2 > -1 && s1[l1] == s2[l2]; l1--, l2--, count++);
     
     return count;
 }
@@ -272,7 +268,7 @@ int sufPref (char s1[], char s2[]) {
     int i, count, j;
 
     for (i = j = 0; s1[i]; i++) {
-        if (s1[i] == s2[j]) {
+        if (s2[j] && s1[i] == s2[j]) {
             j++;
             count++;
         }
@@ -303,8 +299,7 @@ int contaVogais (char s[]) {
     int i, count = 0;
 
     for (i = 0; s[i]; i++) 
-        if (isVogal(s[i]))
-            count++;
+        count += isVogal(s[i]);
 
     return count;
 }
@@ -536,10 +531,8 @@ int triSup (int N, float m [N][N]) {
     
     for (i = 0; i < N && ans; i++) 
         for (j = 0; j < i && ans; j++)
-            if (m [i][j] != 0)
-                ans = 0;
+            ans = m[i][j] == 0;
     
-
     return ans;
 }
 
@@ -658,7 +651,7 @@ int caminho (Posicao inicial, Posicao final, Movimento mov[], int N){
             mov[i] = Oeste;
             inicial.x--;
         } 
-        else if (inicial.x < final.x) {
+        else {
             mov[i] = Este;
             inicial.x++;
         }
@@ -672,11 +665,9 @@ int caminho (Posicao inicial, Posicao final, Movimento mov[], int N){
 // Q49
 int maiscentral (Posicao pos[], int N) {
     int min, dist, r = 0, i;
-    min = pow(pos[0].x, 2) + pow(pos[0].y, 2);
-    
-    for (i = 1; i < N; i++) {
+    for (i = 0; i < N; i++) {
         dist = pow(pos[i].x, 2) + pow(pos[i].y, 2);
-        if (dist < min) {
+        if (!i || dist < min) {
             min = dist;
             r = i;
         }
