@@ -505,14 +505,13 @@ int comuns (int a[], int na, int b[], int nb){
 
 // Q37
 int minInd (int v[], int n) {
-    int r = -1, min, i;
-    
-    for (i = 0; i < n; i++)
-        if (!i || v[i] < min) {
-            min = v[i];
+   int r = -1, i;
+
+   for (i = 0; i < n; i++)
+        if (!i || v[i] < v[r])
             r = i;
-        }
-    return r;
+
+   return r;
 }
 
 // Q38
@@ -677,13 +676,10 @@ int maiscentral (Posicao pos[], int N) {
 
 // Q50
 int vizinhos (Posicao p, Posicao pos[], int N) {
-    int i, contador = 0;
-
-    for (i = 0; i < N; i++) {
-        if (pow(p.x - pos[i].x, 2) + pow(p.y - pos[i].y, 2) < 2 && !iguais(p, pos[i]))
-            contador++;
-    }
-    return contador;
+    int i, count = 0;
+    for (i = 0; i < N; i++) 
+        count += pow(pos[i].x - p.x, 2) + pow(pos[i].y - p.y, 2) < 2 && !iguais(p, pos[i]);
+    return count;;
 }
 
 // PARTE 2
