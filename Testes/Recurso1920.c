@@ -89,7 +89,37 @@ typedef struct abin {
 typedef struct {
     LInt *front, *last;
 } DifList;
+/*
+DifList imprime (ABin a) {
+    DifList dlist;
+    dlist.front = NULL;
+    dlist.last = NULL;
+    if (a) {
+        LInt new = malloc(sizeof(struct slist));
+        new->valor = a->valor;
+        new->prox = NULL;
+        DifList left = imprime(a->esq);
+        DifList right = imprime(a->dir);
+        if (*left.front) {
+            dlist.front = left.front;
+            if (*right.front) 
+                (*left.last)->prox = *right.front;
+            
+            else 
+                (*left.last)->prox = new;
+            (*right.last)->prox = new;
+        }
+        else if (*right.front) {
+            dlist.front = right.front;
+            (*right.last)->prox = new;
+        }
+        else 
+            dlist.front = dlist.last = &new;
+    }
+    return dlist;
+}*/
 
+/*
 DifList imprime (ABin a) { // WRONG
     DifList dlist;
     dlist.front = NULL;
@@ -126,7 +156,7 @@ DifList imprime (ABin a) { // WRONG
     }
 
     return dlist;
-}
+}*/
 
 /* Exercício 5
 Defina uma função que recebe uma árvore de procura de inteiros e um inteiro x e escreve no écran, por ordem crescente e 
@@ -151,25 +181,21 @@ NULL se o elemento não existir na árvore.
 */
 
 LInt caminho (ABin a, int x) {
-    LInt new, head = NULL, list = NULL;
+    LInt head, *r = &head;
     int flag = 1;
-
-    while (a && flag) {
-        new = malloc(sizeof(struct slist));
-        new->valor = a->valor;
-        new->prox = NULL;
-        if (!head)
-            head = list = new;
-        else 
-            list = list->prox = new; 
-        if (x < a->valor) 
-            a = a->esq;
-        else if (x > a->valor)
+    for (; a && flag; r = &(*r)->prox) {
+        *r = malloc(sizeof(struct slist));
+        (*r)->valor = a->valor;
+        if (a->valor < x)
             a = a->dir;
+        else if (a->valor > x) 
+            a = a->esq;
         else 
             flag = 0;
     }
-
+    *r = NULL;
+    if (flag)
+        head = NULL;
     return head;
 }
 
@@ -261,8 +287,8 @@ int main() {
     tree->dir->dir->valor = 8;
     tree->dir->dir->esq = NULL;
     tree->dir->dir->dir = NULL;
-    DifList dflist = imprime(tree);
-    printDifL(dflist);
+    //DifList dflist = imprime(tree);
+    //printDifL(dflist);
 
     // Exercício 5
     printf("\nExercício 5\n");
