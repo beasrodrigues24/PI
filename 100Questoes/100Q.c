@@ -123,14 +123,16 @@ int mystrcmp(char s1[], char s2[]) {
 char *mystrstr (char s1[], char s2[]) {
     char *ret = NULL;
     int i, j, l;
+    
+    if (!(*s2))
+        ret = s1;
+
     for (i = 0; s1[i] && !ret; i++) {
         for (j = 0, l = i; s1[l] == s2[j] && s2[j]; l++, j++);
         if (!s2[j])
             ret = s1 + i;
     }
-    if (!(*s2))
-        ret = s1;
-    
+  
     return ret;
 }
 
@@ -1374,7 +1376,7 @@ void listToBTree (LInt l, ABin *a) {
 
 // Q51
 
-// Versão kinda stupid
+// Versão kinda dumb that works and is shorter
 int compare(ABin a, int num, char c) {
     int ans = 1;
 
