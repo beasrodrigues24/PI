@@ -840,17 +840,16 @@ int removeDups (LInt *l){
 }
 
 // Q12
+int maximo (LInt l);
 int removeMaiorL (LInt *l){
-    LInt curs = *l;
-    int maior = (*l)->valor;
-    for (; curs; curs = curs->prox) 
-        if (curs->valor > maior)
-            maior = curs->valor;
-            
+    int maior = maximo(*l);     
+    
     for (; (*l)->valor != maior; l = &(*l)->prox);
+    
     LInt temp = *l;
     *l = (*l)->prox;
     free(temp);
+    
     return maior;
 }
 
@@ -860,7 +859,6 @@ void init (LInt *l){
     free(*l);
     *l = NULL;
 }
-
 
 // Q14
 void appendL (LInt *l, int x){
