@@ -267,32 +267,34 @@ int maiorSufixo (char s1 [], char s2 []) {
 
 // Q19
 int sufPref (char s1[], char s2[]) {
-    int i, count, j;
+    
+    int i , j;
 
     for (i = j = 0; s1[i]; i++) {
-        if (s2[j] && s1[i] == s2[j]) {
-            j++;
-            count++;
-        }
-        else {
-            count = j = 0;
-        }
+        
+        if (s2[j] && s2[j] == s1[i]) j++;
+        else j = 0;
+        
     }
-    return count;
+    
+    return j;
 }
 
 // Q20
 int contaPal (char s[]) {
-    int inWord = 0, i, count = 0;
+   
+    int i, inWord = 0, count = 0;
     
     for (i = 0; s[i]; i++) {
-        if (inWord && s[i] == ' ')
-            inWord = 0;
+        
+        if (inWord && (s[i] == ' ' || s[i] == '\n')) inWord = 0;
         else if (!inWord && s[i] != ' ' && s[i] != '\n') {
             inWord = 1;
             count++;
         }
+        
     }
+   
     return count;
 }
 
@@ -507,11 +509,16 @@ int comuns (int a[], int na, int b[], int nb){
 
 // Q37
 int minInd (int v[], int n) {
-   int r = -1, i;
-
-   for (i = 0; i < n; i++)
-        if (!i || v[i] < v[r])
-            r = i;
+    
+    int r;
+    if (n < 1) r = -1;
+    else {
+        int i;
+        r = 0;
+        for (i = 1; i < n; i++)
+            if (v[i] < v[r]) 
+                r = i;
+    }
 
    return r;
 }
