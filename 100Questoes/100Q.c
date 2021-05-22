@@ -722,7 +722,7 @@ void freeL (LInt l) {
 void imprimeL (LInt l) {
 
     while (l) {
-        printf("%d", l->valor);
+        printf("%d\n", l->valor);
         l = l->prox; 
     }
 }
