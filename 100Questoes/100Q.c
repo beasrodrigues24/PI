@@ -920,7 +920,7 @@ int maximo (LInt l) {
 // Q19
 int take (int n, LInt *l){
     int count = 0;
-    for (; *l && n > 0; l = &(*l)->prox, n--, count++);
+    for (; *l && count < n; l = &(*l)->prox, count++);
     while (*l) {
         LInt temp = *l;
         *l = (*l)->prox;
